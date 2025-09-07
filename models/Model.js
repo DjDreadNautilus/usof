@@ -1,0 +1,44 @@
+const pool = require("../db/pool")
+const QuerryBuilder = require("./QuerryBuilder");
+ 
+class Model {
+    constructor(attributes = {}) {
+        Object.assign(this, attributes);
+    }
+
+    static async find(where) {
+        const rows = await QuerryBuilder.queryWhere(this.table_name, { where, limit: 1 });
+        return rows.length ? new this(rows[0]) : null;
+    }
+
+    static async getAll(where) {
+        const rows = await QuerryBuilder.queryWhere(this.table_name, {where});
+        return rows.map(row => new this(row));
+    }
+
+    async save() {
+        const fields = Object.keys(this).filter(key => key !== "id");
+        const values = fields.map(key => this[key]);
+
+        if (this.id) {
+            const updates = fields.map(field => `${field} = ?`).join(", ");
+            const sql = `UPDATE ${this.constructor.table_name} SET ${updates} WHERE id = ?`;
+            await pool.execute(sql, [...values, this.id]);
+        }
+        else {
+            const sql = `INSERT INTO ${this.constructor.table_name} (${fields.join(", ")}) VALUES (${fields.map(() => "?").join(", ")})`;
+            const [rows] = await pool.execute(sql, values);
+            this.id = rows.insertId;
+        }
+    }
+
+    async delete() {
+        if (this.id) {
+            const sql = `DELETE FROM ${this.constructor.table_name} WHERE id = ?`;
+            await pool.execute(sql, [this.id]);
+        }
+    }
+
+}
+
+module.exports = Model;
