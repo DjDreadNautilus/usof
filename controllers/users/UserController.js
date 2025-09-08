@@ -9,10 +9,10 @@ class UserController extends BaseController {
 
     async createUser(req, res) {
         try {
-            const {login, fullname, password, email} = req.body;
+            const {login, fullname, password, email, role} = req.body;
 
             const hashedPassword = await Hash.hash(password, 10);
-            const user = new User({login: login, fullname: fullname, password: hashedPassword, email: email});
+            const user = new User({login: login, fullname: fullname, password: hashedPassword, email: email, role: role === null ? roll : "user"});
             await user.save();
 
             res.json({status: "Success!", message: "User created!", });

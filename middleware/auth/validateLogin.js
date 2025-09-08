@@ -22,6 +22,8 @@ async function validateLogin(req, res, next) {
         return res.status(400).send({ error: "Incorrect password!" });
     }
 
+    req.user = user;
+
     next();
 }
 

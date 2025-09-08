@@ -7,9 +7,8 @@ const loginController = {
     login: async (req, res) => {
         try {
 
-            //session stuff
             req.session.authenticated = true;
-            req.session.user = req.body;
+            req.session.user = req.user;
 
             res.json({status: "Success!", message: "Successfully loged it!",});
             res.end;
