@@ -24,7 +24,7 @@ class UserController extends BaseController {
     async updateUser(req, res) {
         const {login, fullname, password, email} = req.body;
 
-
+        
     }
 
     async updateAvatar() {

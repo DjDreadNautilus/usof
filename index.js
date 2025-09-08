@@ -1,13 +1,20 @@
 const express = require("express");
 const app = express();
 const http = require("http").createServer(app);
-const User = require("./models/User");
 
 const router = require("./routers/MainRouter");
+const session = require("express-session");
+
+const session_middleware = session({
+    secret: "secure, frfr, no cap",
+    saveUninitialized: false,
+    resave: true,
+    cookie: {secure: process.env.NODE_ENV === "production"}
+});  
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(session_middleware);
 app.use("/", router);
 
 app.use((err, req, res, next) => {

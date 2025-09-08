@@ -2,7 +2,7 @@ const Validator = require("../../services/Validator");
 const User = require("../../models/User");
 
 async function validateSignup(req, res, next) {
-    const { login, fullname, password, confirmation, email } = req.body;
+    const {login, fullname, password, confirmation, email} = req.body;
 
     if (!login || !fullname || !password || !email) {
         return res.status(400).json({ error: "All fields are required!" });
