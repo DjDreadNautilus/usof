@@ -1,12 +1,15 @@
 const jwt = require('jsonwebtoken')
 
-function jwtGenerator(id, login, email, role) {
+function jwtGenerator(params = {}) {
     const token = jwt.sign(
-        {id: id, login: login, email: email, role: role}, 
+        params, 
         "KEY",
         {expiresIn: "12h"}
     )
     return token;
 }
 
-module.exports = {jwtGenerator};
+module.exports = {
+    jwtGenerator,
+    verify: (token) => jwt.verify(token, "KEY")
+};
