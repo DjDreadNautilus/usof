@@ -1,3 +1,5 @@
+const jwt = require("../../services/JWT");
+
 const loginController = {
 
     getLogin: () => {
@@ -7,8 +9,8 @@ const loginController = {
     login: async (req, res) => {
         try {
 
-            req.session.authenticated = true;
-            req.session.user = req.user;
+            const token = jwt.jwtGenerator({id: req.user.id, login: req.user.login, email: req.user.email, role: req.user.role});
+            res.cookie('token',token,{httpOnly: true, maxAge: 12 * 60 * 60 * 1000});
 
             res.json({status: "Success!", message: "Successfully loged it!",});
             res.end;
@@ -21,18 +23,16 @@ const loginController = {
 
     logout: async (req, res) => {
         try {
-            req.session.authenticated = false;
-            req.session.destroy(async (err) => {
-                if (err) {
-                    return res.status(500).json({error: "Failed to logout"});
-                }
-                await UserListBroadcaster.broadcast_user_list(req);
-                res.status(200).json({message: "Logout successful"});
-            })
-            res.end;
+            res.clearCookie("token", {
+                httpOnly: true,
+                secure: "KEY",
+                sameSite: "strict"
+            });
+            
+            res.status(200).json({ message: "You were logged out" });
         } catch (err) {
-            console.error("Error during login:", err);
-            res.status(500).send({error: "Internal Server Error!"});
+            console.error("Error during logout:", err);
+            res.status(500).json({ error: "Internal Server Error!" });
         }
     }
 }
