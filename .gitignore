@@ -1,2 +1,5 @@
 # node junk
 node_modules/
+
+# env
+.env

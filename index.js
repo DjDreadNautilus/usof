@@ -1,13 +1,13 @@
 const express = require("express");
 const app = express();
 const http = require("http").createServer(app);
-const cookie = require("cookie-parser")
+const cookieParser = require("cookie-parser")
 
 const router = require("./routers/MainRouter");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookie());
+app.use(cookieParser());
 app.use("/", router);
 
 app.use((err, req, res, next) => {
