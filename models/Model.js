@@ -16,20 +16,24 @@ class Model {
         return rows.map(row => new this(row));
     }
 
+    async update(attributes = {}) {
+        if (!this.id) return; 
+        const keys = Object.keys(attributes);
+        const values = Object.values(attributes);
+
+        const updates = keys.map(key => `${key} = ?`).join(", ");
+        const sql = `UPDATE ${this.constructor.table_name} SET ${updates} WHERE id = ?`;
+        await pool.execute(sql, [...values, this.id]);
+        Object.assign(this, attributes);
+    }
+
     async save() {
         const fields = Object.keys(this).filter(key => key !== "id");
         const values = fields.map(key => this[key]);
 
-        if (this.id) {
-            const updates = fields.map(field => `${field} = ?`).join(", ");
-            const sql = `UPDATE ${this.constructor.table_name} SET ${updates} WHERE id = ?`;
-            await pool.execute(sql, [...values, this.id]);
-        }
-        else {
-            const sql = `INSERT INTO ${this.constructor.table_name} (${fields.join(", ")}) VALUES (${fields.map(() => "?").join(", ")})`;
-            const [rows] = await pool.execute(sql, values);
-            this.id = rows.insertId;
-        }
+        const sql = `INSERT INTO ${this.constructor.table_name} (${fields.join(", ")}) VALUES (${fields.map(() => "?").join(", ")})`;
+        const [rows] = await pool.execute(sql, values);
+        this.id = rows.insertId;
     }
 
     async delete() {

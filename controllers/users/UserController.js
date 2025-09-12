@@ -23,21 +23,24 @@ class UserController extends BaseController {
 
     async updateUser(req, res) {
         try {
-            const targetId = req.params.id;
-            const {login, fullname, password, email, role} = req.body;
-            const user = User.find({id: targetId});
+            const userId = req.params.id;
+            const user = await User.find({ id: userId });
 
-            if(login) user.login = login;
-            if(fullname) user.fullname = fullname;
-            if(password) user.password = Hash.hash(password, 10);
-            if(email) user.email = email;
-            if(role) user.role = role;
+            if (!user) {
+                return res.status(404).json({ error: "User not found" });
+            }
 
-            user.save();
+            const updates = { ...req.body };
 
-            res.json({status: "Success!", message: "User updated!", });
+            if (updates.password) {
+                updates.password = await Hash.hash(updates.password, 10);
+            }
+
+            await user.update(updates);
+
+            res.json({ status: "Success!", message: "User updated!" });
         } catch (err) {
-            res.status(500).json({error: err.message});
+            res.status(500).json({ error: err.message });
         }
     }
 

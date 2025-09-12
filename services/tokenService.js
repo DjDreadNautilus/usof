@@ -1,41 +1,48 @@
-const jwt = require('jsonwebtoken')
-require("dotenv").config();
-const RefreshToken = require("../models/RefreshToken")
+	const jwt = require('jsonwebtoken')
+	require("dotenv").config();
+	const RefreshToken = require("../models/RefreshToken")
+	const Hash = require("../services/Hash");
 
-async function createRefreshToken(user) {
+	async function createRefreshToken(user) {
 
-	const payload = {
-        user_id: user.user_id,
-        role: user.role,
-    };
+		const payload = {
+			user_id: user.user_id,
+			role: user.role,
+		};
 
-    const token = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET);
-    const refreshToken = new RefreshToken({
-        user_id: user.user_id, 
-        token: token, 
-        expiration_date: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000)
-    });
+		const token = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET);
+		const refreshToken = new RefreshToken({
+			user_id: user.user_id, 
+			token: await Hash.hash(token, 10), 
+			expiration_date: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000)
+		});
 
-    await refreshToken.save();
+		await refreshToken.save();
 
-    return token;
-}
+		return token;
+	}
 
-function createAccessToken(user) {
-    const payload = {
-        user_id: user.user_id,
-        role: user.role,
-    };
+	function createAccessToken(user) {
+		const payload = {
+			user_id: user.user_id,
+			role: user.role,
+		};
 
-    return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: "15s", 
-    });
-}
+		return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+			expiresIn: "15s", 
+		});
+	}
 
-async function terminateToken(token) {
-    const refreshToken = await RefreshToken.find({token: token});
+	function verifyToken(token) {
+		try {
+			return jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+		} catch(err) {
+			return null;
+		}
+	}
 
-    await refreshToken.delete(); 
-}
+	async function findTokensByUserID(userId) {
+		return await RefreshToken.getAll({user_id: userId});
+	}
 
-module.exports = {createAccessToken, createRefreshToken, terminateToken};
+	module.exports = {createAccessToken, createRefreshToken, verifyToken, findTokensByUserID};

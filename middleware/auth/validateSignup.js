@@ -2,6 +2,7 @@ const Validator = require("../../services/Validator");
 const User = require("../../models/User");
 
 async function validateSignup(req, res, next) {
+    console.log(req.body)
     const {login, fullname, password, confirmation, email} = req.body;
 
     if (!login || !fullname || !password || !email) {
