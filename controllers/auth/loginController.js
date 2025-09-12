@@ -47,19 +47,6 @@ const loginController = {
             console.error("Error during logout:", err);
             res.status(500).json({ error: "Internal Server Error!" });
         }
-    },
-
-    refreshToken: async (req, res) => {
-        try {
-            const token = req.cookies.refreshToken;
-            if (!token) return res.status(401).json({ error: "No refresh token provided" });
-
-            const newAccessToken = await tokenService.refreshAccessToken(token);
-            res.json({ accessToken: newAccessToken });
-        } catch (err) {
-            console.error(err);
-            res.status(403).json({ error: "Invalid refresh token" });
-        }
     }
 }
 
