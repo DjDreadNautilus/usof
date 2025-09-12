@@ -11,7 +11,7 @@ async function createRefreshToken(user) {
 
     const token = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET);
     const refreshToken = new RefreshToken({
-        user_id: userdata.user_id, 
+        user_id: user.user_id, 
         token: token, 
         expiration_date: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000)
     });
