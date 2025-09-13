@@ -52,3 +52,11 @@ CREATE TABLE likes (
     FOREIGN KEY (post_id) REFERENCES posts(id),
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+CREATE TABLE refresh_tokens (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    token varchar(255) NOT NULL,
+    expiration_date TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+)

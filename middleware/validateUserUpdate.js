@@ -1,27 +1,39 @@
 const Validator = require("../services/Validator");
+const User = require("../models/User")
 
 async function validateUserUpdate(req, res, next) {
-    const { login, fullname, password, confirmation, email, role } = req.body;
+    const params = { ...req.body };
+    const userId = req.params.id; 
 
-    if(!Validator.is_valid_login(login)) {
-        return res.status(400).json({ error: "Invalid login!" });
+    if (params.login) {
+        if (!Validator.is_valid_login(params.login)) {
+            return res.status(400).json({ message: "Invalid login!" });
+        }
+
+        const existingLogins = await User.getAll({ login: params.login });
+        if (existingLogins.some(u => u.id !== parseInt(userId))) {
+            return res.status(400).json({ message: "Login already in use!" });
+        }
     }
 
-    if(!Validator.is_valid_password(password)) {
-        return res.status(400).json({ error: "Invalid password!" });
+    if (params.email) {
+        // if (!Validator.is_valid_email(params.email)) {
+        //     return res.status(400).json({ message: "Invalid email!" });
+        // }
+
+        const existingEmails = await User.getAll({ email: params.email });
+        if (existingEmails.some(u => u.id !== parseInt(userId))) {
+            return res.status(400).json({ message: "Email already in use!" });
+        }
     }
 
-    if(password !== confirmation) {
-        return res.status(400).send({error: "Passwords not match!"});
+    if (params.password) {
+        if (!Validator.is_valid_password(params.password)) {
+            return res.status(400).json({ message: "Invalid password!" });
+        }
     }
 
-    const lookup = await User.getAll({login, email});
-
-    if(lookup.length === 0) {
-        return res.status(400).send({error: "User with this login/email not found!"});
-    }
-
-    next();
+    next(); 
 }
 
 module.exports = {validateUserUpdate}
