@@ -59,4 +59,12 @@ CREATE TABLE refresh_tokens (
     token varchar(255) NOT NULL,
     expiration_date TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
-)
+);
+
+CREATE TABLE reset_tokens (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_email VARCHAR(255) NOT NULL,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    expiration_date TIMESTAMP NOT NULL,
+    FOREIGN KEY (user_email) REFERENCES users(email) ON DELETE CASCADE
+);

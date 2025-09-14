@@ -9,12 +9,16 @@ async function validateSignup(req, res, next) {
         return res.status(400).json({ error: "All fields are required!" });
     }
 
-    if(!Validator.is_valid_login(login)) {
+    if(!Validator.isValidLogin(login)) {
         return res.status(400).json({ error: "Invalid login!" });
     }
 
-    if(!Validator.is_valid_password(password)) {
+    if(!Validator.isValidPassword(password)) {
         return res.status(400).json({ error: "Invalid password!" });
+    }
+
+    if(!Validator.isValidEmail(email)) {
+        return res.status(400).json({error: "Invalid email"});
     }
 
     if (password !== confirmation) {

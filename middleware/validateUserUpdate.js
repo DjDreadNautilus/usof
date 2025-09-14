@@ -6,10 +6,6 @@ async function validateUserUpdate(req, res, next) {
     const userId = req.params.id; 
 
     if (params.login) {
-        if (!Validator.is_valid_login(params.login)) {
-            return res.status(400).json({ message: "Invalid login!" });
-        }
-
         const existingLogins = await User.getAll({ login: params.login });
         if (existingLogins.some(u => u.id !== parseInt(userId))) {
             return res.status(400).json({ message: "Login already in use!" });
@@ -17,9 +13,9 @@ async function validateUserUpdate(req, res, next) {
     }
 
     if (params.email) {
-        // if (!Validator.is_valid_email(params.email)) {
-        //     return res.status(400).json({ message: "Invalid email!" });
-        // }
+        if(!Validator.isValidEmail(email)) {
+            return res.status(400).json({error: "Invalid email"});
+        }
 
         const existingEmails = await User.getAll({ email: params.email });
         if (existingEmails.some(u => u.id !== parseInt(userId))) {
@@ -27,8 +23,12 @@ async function validateUserUpdate(req, res, next) {
         }
     }
 
+    if (!Validator.isValidLogin(params.login)) {
+        return res.status(400).json({ message: "Invalid login!" });
+    }
+
     if (params.password) {
-        if (!Validator.is_valid_password(params.password)) {
+        if (!Validator.isValidPassword(params.password)) {
             return res.status(400).json({ message: "Invalid password!" });
         }
     }
