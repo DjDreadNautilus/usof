@@ -48,8 +48,6 @@ const resetPasswordController = {
             console.error("Error during message sending:", err);
             res.status(500).json({ error: "Internal Server Error!" });
         }
-
-
     },
 
     resetPassword: async (req, res) => {

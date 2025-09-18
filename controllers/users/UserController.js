@@ -12,7 +12,7 @@ class UserController extends BaseController {
             const {login, fullname, password, email, role} = req.body;
 
             const hashedPassword = await Hash.hash(password, 10);
-            const user = new User({login: login, fullname: fullname, password: hashedPassword, email: email, role: role !== null ? role : "user"});
+            const user = new User({login: login, fullname: fullname, password: hashedPassword, email: email, role: role !== null ? role : "user", rating: 0});
             await user.save();
 
             res.json({status: "Success!", message: "User created!", });
@@ -23,7 +23,7 @@ class UserController extends BaseController {
 
     async updateUser(req, res) {
         try {
-            const userId = req.params.id;
+            const userId = req.params.user_id;
             const user = await User.find({ id: userId });
 
             if (!user) {
@@ -44,8 +44,21 @@ class UserController extends BaseController {
         }
     }
 
-    async updateAvatar() {
+    async updateAvatar(req, res) {
+        if (!req.file) {
+            return res.status(400).json({ error: "Avatar file is required" });
+        }
 
+        console.log(req.user)
+        const user = await User.find({id: req.user.user_id});
+
+        const relativePath = `/uploads/avatars/${req.file.filename}`;
+        await user.update({ avatar: relativePath });
+
+        res.json({
+            message: "Avatar uploaded successfully",
+            avatar: relativePath,
+        });
     }
 }
 

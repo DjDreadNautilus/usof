@@ -24,12 +24,12 @@
 
 	function createAccessToken(user) {
 		const payload = {
-			user_id: user.user_id,
+			user_id: user.id,
 			role: user.role,
 		};
 
 		return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-			expiresIn: "15s", 
+			expiresIn: "10m", 
 		});
 	}
 

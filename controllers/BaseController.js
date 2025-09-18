@@ -5,7 +5,7 @@ class BaseController {
 
     getAll = async (req, res) => {
         try {
-            const items = await this.model.getAll();
+            const items = await this.model.getAll({});
             res.json(items);
         } catch (err) {
             res.status(500).json({error: err.message});
@@ -14,7 +14,8 @@ class BaseController {
 
     getById = async (req, res) => {
         try {
-            const item = await this.model.find({id: req.params.id});
+            const id = Object.values(req.params)[0];
+            const item = await this.model.find({id: id});
             res.json(item);
         } catch (err) {
             res.status(500).json({error: err.message})
@@ -23,7 +24,8 @@ class BaseController {
 
     delete = async (req, res) => {
         try {
-            const item = await this.model.find({id: req.params.id});
+            const id = Object.values(req.params)[0]; 
+            const item = await this.model.find({id: id});
             if (!item) return res.status(404).json({ error: "Not found" });
             await item.delete();
             res.json({message: "Deleted."});

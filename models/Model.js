@@ -6,12 +6,12 @@ class Model {
         Object.assign(this, attributes);
     }
 
-    static async find(where) {
+    static async find(where = {}) {
         const rows = await QuerryBuilder.queryWhere(this.table_name, { where, limit: 1 });
         return rows.length ? new this(rows[0]) : null;
     }
 
-    static async getAll(where) {
+    static async getAll(where = {}) {
         const rows = await QuerryBuilder.queryWhere(this.table_name, {where});
         return rows.map(row => new this(row));
     }

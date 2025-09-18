@@ -1,20 +1,23 @@
 const pool = require("../db/pool");
 
-async function queryWhere(tableName,
-                           {
-                               where = {},
-                               strict = false,
-                               limit = null
-                           } = {}) {
-    const keys = Object.keys(where);
-    const values = Object.values(where);
+async function queryWhere(table, { where = {}, limit }) {
+    const conditions = [];
+    const values = [];
 
-    const condition = keys.length
-        ? keys.map(k => `${k} = ?`).join(strict ? ' AND ' : ' OR ')
-        : '1';
-    let sql = `SELECT * FROM ${tableName} WHERE ${condition}`;
-    if (limit !== null)
-        sql += ` LIMIT ${limit}`;
+    for (const [key, value] of Object.entries(where)) {
+        if (Array.isArray(value)) {
+            const placeholders = value.map(() => "?").join(", ");
+            conditions.push(`${key} IN (${placeholders})`);
+            values.push(...value);
+        } else {
+            conditions.push(`${key} = ?`);
+            values.push(value);
+        }
+    }
+
+    const whereClause = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+    const limitClause = limit ? `LIMIT ${limit}` : "";
+    const sql = `SELECT * FROM ${table} ${whereClause} ${limitClause}`;
 
     const [rows] = await pool.execute(sql, values);
     return rows;

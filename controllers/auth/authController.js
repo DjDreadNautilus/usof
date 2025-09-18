@@ -29,7 +29,7 @@ const loginController = {
             const {login, fullname, password, email} = req.body;
 
             const hashedPassword = await Hash.hash(password, 10);
-            const user = new User({login: login, fullname: fullname, password: hashedPassword, email: email, role: "user"});
+            const user = new User({login: login, fullname: fullname, password: hashedPassword, email: email, role: "user", rating: 0});
             await user.save();
 
             res.status(200).json({ message: "Registered!" });

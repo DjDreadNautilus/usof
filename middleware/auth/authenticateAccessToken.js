@@ -10,6 +10,7 @@ function authenticateAccessToken(req, res, next) {
         if (err) return res.status(403).json({ error: "Invalid or expired access token" });
 
         req.user = decoded; 
+        console.log("Decoded token:", req.user);
         next();
     });
 }
