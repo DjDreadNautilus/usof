@@ -32,7 +32,7 @@ class CategoryController extends BaseController {
             const category = await Category.find({ id: id });
 
             if (!category) {
-                return res.status(404).json({ error: "User not found" });
+                return res.status(404).json({ error: "Category not found" });
             }
 
             //validator potom napishy

@@ -1,12 +1,14 @@
 const Category = require("../../models/Category");
 const PostCategories = require("../../models/PostCategories");
 const Post = require("../../models/Posts");
-const BaseController = require("../BaseController");
+const Likable = require("../Likable");
+const Comment = require("../../models/Comment");
+const Like = require("../../models/Like");
 
 
-class PostController extends BaseController {
+class PostController extends Likable {
     constructor() {
-        super(Post);
+        super(Post, "post_id");
     }
 
     async createPost(req, res) {
@@ -46,6 +48,39 @@ class PostController extends BaseController {
             const categories = await Category.getAll({ id: ids });
 
             res.status(200).json({categories: categories, message: "Got categories from post!"});
+        } catch(err) {
+           res.status(500).json({error: err.message}); 
+        }
+    }
+
+    async createComment(req, res) {
+        try {
+            const id = req.params.post_id;
+            const user = req.user;
+            const content = req.body.content;
+
+            if(!content) {
+                res.status(400).json({error: "Empty comment"});
+            }
+
+            const comment = new Comment({user_id: user.user_id, post_id: id, content: content, created_at: new Date()});
+            console.log(comment);
+            
+            comment.save();
+
+            res.status(200).json(comment);
+        } catch(err) {
+            res.status(500).json({error: err.message}); 
+        }
+    }
+
+    async getComments(req, res) {
+        try {
+            const id = req.params.post_id;
+
+            const comments = await Comment.getAll({ post_id: id });
+
+            res.status(200).json({comments: comments, message: "Got comments from post!"});
         } catch(err) {
            res.status(500).json({error: err.message}); 
         }

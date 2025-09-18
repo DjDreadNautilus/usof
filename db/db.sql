@@ -37,7 +37,7 @@ CREATE TABLE comments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     post_id INT NOT NULL,
-    content VARCHAR(500) NOT NULL,
+    content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
@@ -45,12 +45,18 @@ CREATE TABLE comments (
 
 CREATE TABLE likes (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    post_id INT NOT NULL,
+    post_id INT,
+    comment_id INT,
     user_id INT NOT NULL,
-    published_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    type TINYINT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    type varchar(100) NOT NULL,
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CHECK (
+        (post_id IS NULL AND comment_id IS NOT NULL) OR 
+        (post_id IS NOT NULL AND comment_id IS NULL)
+    )
 );
 
 CREATE TABLE post_categories (
