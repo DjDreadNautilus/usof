@@ -85,6 +85,22 @@ class PostController extends Likable {
            res.status(500).json({error: err.message}); 
         }
     }
+
+    getAll = async (req, res) => {
+        try {
+            const page = parseInt(req.query.page) || 1; 
+            const limit = parseInt(req.query.limit) || 5;   
+            const offset = (page - 1) * limit;   
+            const orderBy = req.query.orderBy;
+            const order = req.query.order || "ASC";
+
+            const posts = await Post.getAll({limit: limit, offset: offset, orderBy: orderBy, order: order});
+
+            res.json(posts);
+        } catch(err) {
+           res.status(500).json({error: err.message}); 
+        }
+    }
 }
 
 module.exports = new PostController();

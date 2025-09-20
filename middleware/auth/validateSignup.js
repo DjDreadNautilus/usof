@@ -25,10 +25,14 @@ async function validateSignup(req, res, next) {
         return res.status(400).json({ error: "Passwords do not match!" });
     }
 
-    const lookup = await User.getAll({login, email});
+    const existingLogins = await User.getAll({ login: login });
+    if (existingLogins.length > 0) {
+        return res.status(400).json({ message: "Login already in use!" });
+    }
 
-    if(lookup.length > 0) {
-        return res.status(400).send({error: "User with this login/email already exists!"});
+    const existingEmails = await User.getAll({ email: email });
+    if (existingEmails.length > 0) {
+        return res.status(400).json({ message: "Email already in use!" });
     }
 
     next();

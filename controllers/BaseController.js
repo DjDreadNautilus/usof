@@ -5,6 +5,9 @@ class BaseController {
 
     getAll = async (req, res) => {
         try {
+            if (req.posts) {
+                return res.json(req.posts);
+            }
             const items = await this.model.getAll({});
             res.json(items);
         } catch (err) {

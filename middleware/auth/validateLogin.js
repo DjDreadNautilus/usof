@@ -8,13 +8,17 @@ async function validateLogin(req, res, next) {
         return res.status(400).send({error: "All fields are required!"});
     }
 
-    const lookup = await User.getAll({login, email});
-
-    if(lookup.length === 0) {
-        return res.status(400).send({error: "User with this login/email not found!"});
+    const existingLogins = await User.getAll({ login: login });
+    if (existingLogins.length <= 0) {
+        return res.status(400).json({ message: "User with this login not found!" });
     }
 
-    const user = lookup[0];
+    const existingEmails = await User.getAll({ email: email });
+    if (existingEmails.length <= 0) {
+        return res.status(400).json({ message: "User with this email not found!" });
+    }
+
+    const user = existingLogins[0];
 
     const isMatch = await Hash.compareHash(password, user.password);
     

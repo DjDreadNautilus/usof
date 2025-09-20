@@ -11,8 +11,14 @@ class Model {
         return rows.length ? new this(rows[0]) : null;
     }
 
-    static async getAll(where = {}) {
-        const rows = await QuerryBuilder.queryWhere(this.table_name, {where});
+    static async getAll(options = {}) {
+        let { where = {}, limit, offset, orderBy, order, ...rest } = options;
+
+        if (Object.keys(rest).length) {
+            where = { ...where, ...rest };
+        }
+
+        const rows = await QuerryBuilder.queryWhere(this.table_name, { where, limit, offset, orderBy, order });
         return rows.map(row => new this(row));
     }
 

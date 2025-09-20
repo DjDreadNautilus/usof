@@ -29,7 +29,7 @@ class Likable extends BaseController {
             
             await like.save();
 
-            res.status(200).json(like);
+            res.status(200).json({like: like, message: "Created like!"});
         } catch(err) {
             res.status(500).json({error: err.message}); 
         }
