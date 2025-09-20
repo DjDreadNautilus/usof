@@ -1,10 +1,11 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const UserController = require("../../controllers/users/UserController");
-const {validateSignup} = require("../../middleware/auth/validateSignup");
-const {validateUserUpdate} = require("../../middleware/validateUserUpdate");
-const fileUpload = require("../../middleware/fileUpload");
-const {authenticateAccessToken} = require("../../middleware/auth/authenticateAccessToken");
+
+import UserController from "../../controllers/users/UserController.js";
+import { validateSignup } from "../../middleware/auth/validateSignup.js";
+import { validateUserUpdate } from "../../middleware/validateUserUpdate.js";
+import fileUpload from "../../middleware/fileUpload.js";
+import { authenticateAccessToken } from "../../middleware/auth/authenticateAccessToken.js";
 
 router.get("/", UserController.getAll);
 router.get("/:user_id", UserController.getById);
@@ -14,4 +15,4 @@ router.patch("/avatar", fileUpload, UserController.updateAvatar);
 router.patch("/:user_id", validateUserUpdate, UserController.updateUser);
 
 
-module.exports = router;
+export default router;

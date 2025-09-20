@@ -1,6 +1,5 @@
-const Comment = require("../../models/Comment");
-const Likable = require("../Likable");
-const BaseController = require("../BaseController");
+import Comment from "../../models/Comment.js";
+import Likable from "../Likable.js";
 
 class CommentController extends Likable {
     constructor() {
@@ -9,17 +8,14 @@ class CommentController extends Likable {
 
     async updateComment(req, res) {
         try {
-            const id = req.params.comment_id;
-            const comment = await Comment.find({ id: id });
+            const { comment_id } = req.params;
+            const comment = await Comment.find({ id: comment_id });
 
             if (!comment) {
                 return res.status(404).json({ error: "Comment not found" });
             }
 
-            //validator potom napishy
-
             const updates = { ...req.body };
-
             await comment.update(updates);
 
             res.json({ status: "Success!", message: "Comment updated!" });
@@ -29,4 +25,4 @@ class CommentController extends Likable {
     }
 }
 
-module.exports = new CommentController();
+export default new CommentController();

@@ -1,11 +1,11 @@
-    const bcrypt = require("bcrypt");
+import bcrypt from "bcrypt";
 
-    async function hash(data, salt) {
-        return await bcrypt.hash(data, salt);
-    }
+async function hash(data, salt) {
+    return await bcrypt.hash(data, salt);
+}
 
-    async function compareHash(str, encrypted) {
-        return await bcrypt.compare(str, encrypted);
-    }
+async function compareHash(str, encrypted) {
+    return await bcrypt.compare(str, encrypted);
+}
 
-    module.exports = {hash, compareHash};
+export default {hash, compareHash}

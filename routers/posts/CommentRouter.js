@@ -1,7 +1,8 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const CommentController = require("../../controllers/posts/CommentController");
-const {authenticateAccessToken} = require("../../middleware/auth/authenticateAccessToken");
+
+import CommentController from "../../controllers/posts/CommentController.js";
+import { authenticateAccessToken } from "../../middleware/auth/authenticateAccessToken.js";
 
 router.get("/:comment_id", CommentController.getById);
 router.get("/:comment_id/like", CommentController.getLikes);
@@ -13,4 +14,4 @@ router.patch("/:comment_id", CommentController.updateComment);
 router.delete("/:comment_id", CommentController.delete);
 router.delete("/:comment_id/like", CommentController.deleteLike);
 
-module.exports = router;
+export default router;

@@ -1,8 +1,8 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const PostController = require("../../controllers/posts/PostController");
 
-const {authenticateAccessToken} = require("../../middleware/auth/authenticateAccessToken");
+import PostController from "../../controllers/posts/PostController.js";
+import { authenticateAccessToken } from "../../middleware/auth/authenticateAccessToken.js";
 
 router.get("/", PostController.getAll);
 router.get("/:category_id", PostController.getById);
@@ -17,4 +17,4 @@ router.post("/:post_id/like", authenticateAccessToken, PostController.createLike
 router.delete("/:post_id/like", authenticateAccessToken, PostController.deleteLike);
 router.delete("/:post_id", PostController.delete);
 
-module.exports = router;
+export default router;

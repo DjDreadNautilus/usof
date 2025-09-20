@@ -1,5 +1,5 @@
-const pool = require("../db/pool")
-const QuerryBuilder = require("./QuerryBuilder");
+import pool from "../db/pool.js";
+import QuerryBuilder from "./QuerryBuilder.js";
  
 class Model {
     constructor(attributes = {}) {
@@ -51,4 +51,4 @@ class Model {
 
 }
 
-module.exports = Model;
+export default Model;

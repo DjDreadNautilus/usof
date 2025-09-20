@@ -1,17 +1,16 @@
-const nodemailer = require("nodemailer");
-const crypto = require("crypto");
-const Hash = require("../../services/Hash");
-const User = require("../../models/User");
-const ResetToken = require("../../models/ResetToken");
+import nodemailer from "nodemailer";
+import crypto from "crypto";
+import Hash from "../../services/Hash.js";
+import User from "../../models/User.js";
+import ResetToken from "../../models/ResetToken.js";
 
 const resetPasswordController = {
     sendResetMail: async (req, res) => {
         try {
-            const {email} = req.body;
+            const { email } = req.body;
 
-            const user = await User.find({email: email});
-
-            if(!user) {
+            const user = await User.find({ email });
+            if (!user) {
                 return res.status(400).json({ error: "User not found" });
             }
 
@@ -21,7 +20,7 @@ const resetPasswordController = {
                 expiration_date: new Date(Date.now() + 15 * 60 * 1000)
             });
             
-            token.save();
+            await token.save();
 
             const link = `http://localhost:8080/auth/password-reset/${token.token}`;
 
@@ -35,7 +34,7 @@ const resetPasswordController = {
                 },
             });
 
-            const info = await transporter.sendMail({
+            await transporter.sendMail({
                 from: '"App support" <MS_jV2Bbi@test-2p0347zknqplzdrn.mlsender.net>', 
                 to: email, 
                 subject: "Password restoration",
@@ -43,8 +42,8 @@ const resetPasswordController = {
                 html: `<b>Restoration link: ${link}</b>`,
             });
 
-            res.status(200).json({message: "Reset message sent!"});
-        } catch(err) {
+            res.status(200).json({ message: "Reset message sent!" });
+        } catch (err) {
             console.error("Error during message sending:", err);
             res.status(500).json({ error: "Internal Server Error!" });
         }
@@ -52,19 +51,18 @@ const resetPasswordController = {
 
     resetPassword: async (req, res) => {
         try {
-            const password = req.body.password;
+            const { password } = req.body;
             const user = req.user;
 
             const hashedPassword = await Hash.hash(password, 10);
-            await user.update({password: hashedPassword});
+            await user.update({ password: hashedPassword });
 
-            res.status(200).json({message: "Password reset!"});
-        } catch(err) {
+            res.status(200).json({ message: "Password reset!" });
+        } catch (err) {
             console.error("Error during password reset:", err);
             res.status(500).json({ error: "Internal Server Error!" });
         }
-
     }
-}
+};
 
-module.exports = resetPasswordController;
+export default resetPasswordController;

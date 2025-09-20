@@ -13,4 +13,4 @@ function isValidEmail(email) {
     return regex.test(email);
 }
 
-module.exports = {isValidPassword, isValidLogin, isValidEmail};
+export default {isValidPassword, isValidEmail, isValidLogin}

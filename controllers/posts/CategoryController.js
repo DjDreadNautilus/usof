@@ -1,7 +1,7 @@
-const BaseController = require("../BaseController")
-const Category = require("../../models/Category");
-const PostCategories = require("../../models/PostCategories");
-const Post = require("../../models/Posts");
+import BaseController from "../BaseController.js";
+import Category from "../../models/Category.js";
+import PostCategories from "../../models/PostCategories.js";
+import Post from "../../models/Posts.js";
 
 class CategoryController extends BaseController {
     constructor() {
@@ -10,35 +10,35 @@ class CategoryController extends BaseController {
 
     async createCategory(req, res) {
         try {
-            const {title, description} = req.body;
+            const { title, description } = req.body;
 
-            if(!title) {
-                return res.status(400).json({error: "all fields required!"});
+            if (!title) {
+                return res.status(400).json({ error: "All fields required!" });
             }
 
-            const category = new Category({title: title, description: description ? description : "nothing here yet"});
+            const category = new Category({
+                title,
+                description: description || "nothing here yet"
+            });
 
-            category.save();
+            await category.save();
 
-            res.status(200).json({category: category, message: "Successfully created a category!"});
-        } catch(err) {
-            res.status(500).json({error: err.message});
+            res.status(200).json({ category, message: "Successfully created a category!" });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
         }
     }
 
     async updateCategory(req, res) {
         try {
-            const id = req.params.category_id;
-            const category = await Category.find({ id: id });
+            const { category_id } = req.params;
+            const category = await Category.find({ id: category_id });
 
             if (!category) {
                 return res.status(404).json({ error: "Category not found" });
             }
 
-            //validator potom napishy
-
             const updates = { ...req.body };
-
             await category.update(updates);
 
             res.json({ status: "Success!", message: "Category updated!" });
@@ -49,18 +49,18 @@ class CategoryController extends BaseController {
 
     async getPosts(req, res) {
         try {
-            const id = req.params.category_id;
-            
-            const relations = await PostCategories.getAll({ category_id: id });
+            const { category_id } = req.params;
+
+            const relations = await PostCategories.getAll({ category_id });
             const ids = relations.map(r => r.post_id);
 
             const posts = await Post.getAll({ id: ids });
 
-            res.status(200).json({posts: posts, message: "Got posts from category!"});
-        } catch(err) {
+            res.status(200).json({ posts, message: "Got posts from category!" });
+        } catch (err) {
             res.status(500).json({ error: err.message });
         }
     }
 }
 
-module.exports = new CategoryController();
+export default new CategoryController();
