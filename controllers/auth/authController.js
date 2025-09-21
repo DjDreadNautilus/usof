@@ -2,8 +2,8 @@ import tokenService from "../../services/tokenService.js";
 import Hash from "../../services/Hash.js";
 import User from "../../models/User.js";
 
-const authController = {
-    login: async (req, res) => {
+class AuthController {
+    login = async (req, res) => {
         try {
             const refreshToken = await tokenService.createRefreshToken({ user_id: req.user.id, role: req.user.role });
             const accessToken = tokenService.createAccessToken(req.user);
@@ -20,9 +20,9 @@ const authController = {
             console.error("Error during login:", err);
             res.status(500).json({ error: "Internal Server Error!" });
         }
-    },
+    }
 
-    signup: async (req, res) => {
+    signup = async (req, res) => {
         try {
             const { login, fullname, password, email } = req.body;
 
@@ -35,9 +35,9 @@ const authController = {
             console.error("Error during signup:", err);
             res.status(500).json({ error: "Internal Server Error!" });
         }
-    },
+    }
 
-    logout: async (req, res) => {
+    logout = async (req, res) => {
         try {
             const refreshToken = req.cookies.refreshToken;
             if (!refreshToken) return res.status(400).json({ error: "No refresh token provided" });
@@ -71,6 +71,6 @@ const authController = {
             res.status(500).json({ error: "Internal Server Error!" });
         }
     }
-};
+}
 
-export default authController;
+export default new AuthController();

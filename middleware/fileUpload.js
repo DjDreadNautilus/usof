@@ -28,7 +28,7 @@ function fileFilter(req, file, cb) {
 const uploadAvatar = multer({
     storage,
     fileFilter,
-    limits: { fileSize: 2 * 1024 * 1024 },
+    limits: { fileSize: 10 * 1024 * 1024 },
 }).single("avatar");
 
 export default uploadAvatar;

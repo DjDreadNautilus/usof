@@ -14,10 +14,6 @@ class PostController extends Likable {
             const { title, content, categories } = req.body;
             const user = req.user;
 
-            if (!title || !content || !categories) {
-                return res.status(400).json({ error: "All fields required!" });
-            }
-
             const post = new Post({
                 user_id: user.user_id,
                 title,
@@ -37,11 +33,58 @@ class PostController extends Likable {
         }
     }
 
+    async updatePost(req, res) {
+        try {
+            const { post_id } = req.params;
+
+            const post = await Post.find({id: post_id});
+
+            const { categories, ...updates } = req.body;
+
+            post.update(updates);
+
+            if (categories) {
+
+                await PostCategories.deleteAll({post_id: post_id});
+
+                for (const category_id of categories) {
+                    const relation = new PostCategories({ post_id, category_id });
+                    await relation.save();
+                }
+            }
+
+            res.status(200).json({message: "Post updated"});
+        } catch(err) {
+            res.status(500).json({ error: err.message });
+        }
+    }
+
+    async updateStatus(req, res) {
+        try {
+            const { post_id } = req.params;
+            const status = req.body.status;
+            const post = await Post.find({id: post_id});
+
+            if(!post) { 
+                res.status(404).json({message: "Post not found"});
+            }
+
+            if (!["active", "inactive"].includes(status)) {
+                return res.status(400).json({ message: "Invalid status value" });
+            }
+
+            post.update({status: status});
+            res.status(200).json({message: "Status updated"});
+        } catch(err) {
+            res.status(500).json({ error: err.message});
+        }
+    }
+
     async getCategories(req, res) {
         try {
             const { post_id } = req.params;
 
-            const relations = await PostCategories.getAll({ post_id });
+            const relations = await PostCategories.getAll({ post_id: post_id });
             const ids = relations.map(r => r.category_id);
 
             const categories = await Category.getAll({ id: ids });
@@ -55,6 +98,10 @@ class PostController extends Likable {
     async createComment(req, res) {
         try {
             const { post_id } = req.params;
+            const post = await Post.find({id: post_id});
+            if(!post || post.status === "inactive") {
+                res.status(400).json({message: "Post is not available"});
+            }
             const user = req.user;
             const { content } = req.body;
 
@@ -64,8 +111,8 @@ class PostController extends Likable {
 
             const comment = new Comment({
                 user_id: user.user_id,
-                post_id,
-                content,
+                post_id: post_id,
+                content: content,
                 created_at: new Date()
             });
 
@@ -81,7 +128,7 @@ class PostController extends Likable {
         try {
             const { post_id } = req.params;
 
-            const comments = await Comment.getAll({ post_id });
+            const comments = await Comment.getAll({ post_id: post_id });
 
             res.status(200).json({ comments, message: "Got comments from post!" });
         } catch (err) {
@@ -91,13 +138,34 @@ class PostController extends Likable {
 
     getAll = async (req, res) => {
         try {
-            const page = parseInt(req.query.page) || 1;
-            const limit = parseInt(req.query.limit) || 5;
-            const offset = (page - 1) * limit;
-            const { orderBy, order = "ASC" } = req.query;
+            const query = req.query;
+            console.log(query);
 
-            const posts = await Post.getAll({ limit, offset, orderBy, order });
+            let category_ids = [];
+            if (query.category_ids) {
+                category_ids = query.category_ids.split(",").map(id => parseInt(id));
+            }
 
+            const limit = query.limit ? parseInt(query.limit) : 5;
+            const page = query.page ? parseInt(query.page) : 1;
+            const offset = (page - 1) * limit
+
+            const filters = {
+                category_ids,
+                status: query.status,
+                user_id: query.user_id ? parseInt(query.user_id) : undefined,
+                created_from: query.created_from,
+                created_to: query.created_to,
+                order_by: query.order_by,
+                order: query.order,
+                limit: limit,
+                offset: offset
+            };
+
+            Object.keys(filters).forEach(key => filters[key] === undefined && delete filters[key]);
+            console.log(filters);
+
+            const posts = await Post.filter(filters);
             res.json(posts);
         } catch (err) {
             res.status(500).json({ error: err.message });

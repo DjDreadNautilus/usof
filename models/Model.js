@@ -22,6 +22,20 @@ class Model {
         return rows.map(row => new this(row));
     }
 
+    static async deleteAll(options = {}) {
+        const keys = Object.keys(options);
+        const values = Object.values(options);
+
+        if (!keys.length) {
+            throw new Error("No conditions provided for deleteAll — refusing to delete all rows.");
+        }
+
+        const whereClause = keys.map(key => `${key} = ?`).join(" AND ");
+        const sql = `DELETE FROM ${this.table_name} WHERE ${whereClause}`;
+
+        await pool.execute(sql, values);
+    }
+
     async update(attributes = {}) {
         if (!this.id) return; 
         const keys = Object.keys(attributes);

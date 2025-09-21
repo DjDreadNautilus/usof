@@ -4,8 +4,8 @@ import Hash from "../../services/Hash.js";
 import User from "../../models/User.js";
 import ResetToken from "../../models/ResetToken.js";
 
-const resetPasswordController = {
-    sendResetMail: async (req, res) => {
+class resetPasswordController {
+    sendResetMail = async (req, res) => {
         try {
             const { email } = req.body;
 
@@ -47,9 +47,9 @@ const resetPasswordController = {
             console.error("Error during message sending:", err);
             res.status(500).json({ error: "Internal Server Error!" });
         }
-    },
+    }
 
-    resetPassword: async (req, res) => {
+    resetPassword = async (req, res) => {
         try {
             const { password } = req.body;
             const user = req.user;
@@ -65,4 +65,4 @@ const resetPasswordController = {
     }
 };
 
-export default resetPasswordController;
+export default new resetPasswordController();

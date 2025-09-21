@@ -51,7 +51,7 @@ class CategoryController extends BaseController {
         try {
             const { category_id } = req.params;
 
-            const relations = await PostCategories.getAll({ category_id });
+            const relations = await PostCategories.getAll({ category_id: category_id });
             const ids = relations.map(r => r.post_id);
 
             const posts = await Post.getAll({ id: ids });
