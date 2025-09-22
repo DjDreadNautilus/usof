@@ -7,6 +7,7 @@ import { validatePostCreate } from "../../middleware/validatePostCreate.js";
 import { validatePostUpdate } from "../../middleware/validatePostUpdate.js";
 import checkRights from "../../middleware/checkRights.js";
 import Post from "../../models/Posts.js";
+import validateCommentCreate from "../../middleware/validateCommentCreate.js";
 
 router.get("/", PostController.getAll);
 router.get("/:category_id", PostController.getById);
@@ -15,12 +16,12 @@ router.get("/:post_id/comments", PostController.getComments);
 router.get("/:post_id/like", PostController.getLikes);
 
 router.post("/", authenticateAccessToken, validatePostCreate, PostController.createPost);
-router.post("/:post_id/comments", authenticateAccessToken, PostController.createComment);
+router.post("/:post_id/comments", authenticateAccessToken, validateCommentCreate, PostController.createComment);
 router.post("/:post_id/like", authenticateAccessToken, PostController.createLike);
 
-router.patch("/:post_id", authenticateAccessToken, checkRights(Post, "post_id"), validatePostUpdate, PostController.updatePost);
+router.patch("/:post_id", authenticateAccessToken, validatePostUpdate, PostController.updatePost);
 
-router.delete("/:post_id/like", authenticateAccessToken, checkRights(Post, "post_id"), PostController.deleteLike);
-router.delete("/:post_id", authenticateAccessToken, checkRights(Post, "post_id"), PostController.delete);
+router.delete("/:post_id/like", authenticateAccessToken, PostController.deleteLike);
+router.delete("/:post_id", authenticateAccessToken, PostController.delete);
 
 export default router;

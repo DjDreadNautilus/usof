@@ -38,7 +38,7 @@ class UserController extends BaseController {
                 return res.status(404).json({ error: "User not found" });
             }
 
-            const updates = { ...req.body };
+            const updates = req.updates;
 
             if (updates.password) {
                 updates.password = await Hash.hash(updates.password, 10);

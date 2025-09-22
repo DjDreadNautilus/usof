@@ -11,7 +11,8 @@ class PostController extends Likable {
 
     async createPost(req, res) {
         try {
-            const { title, content, categories } = req.body;
+            console.log(req.postData);
+            const { title, content, categories } = req.postData;
             const user = req.user;
 
             const post = new Post({
@@ -37,9 +38,10 @@ class PostController extends Likable {
         try {
             const { post_id } = req.params;
 
-            const post = await Post.find({id: post_id});
+            const post = req.post;
 
-            const { categories, ...updates } = req.body;
+            const updates = req.updates;
+            const categories = updates.categories;
 
             post.update(updates);
 
@@ -59,26 +61,6 @@ class PostController extends Likable {
         }
     }
 
-    async updateStatus(req, res) {
-        try {
-            const { post_id } = req.params;
-            const status = req.body.status;
-            const post = await Post.find({id: post_id});
-
-            if(!post) { 
-                res.status(404).json({message: "Post not found"});
-            }
-
-            if (!["active", "inactive"].includes(status)) {
-                return res.status(400).json({ message: "Invalid status value" });
-            }
-
-            post.update({status: status});
-            res.status(200).json({message: "Status updated"});
-        } catch(err) {
-            res.status(500).json({ error: err.message});
-        }
-    }
 
     async getCategories(req, res) {
         try {

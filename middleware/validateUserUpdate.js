@@ -3,37 +3,43 @@ import User from "../models/User.js";
 
 export async function validateUserUpdate(req, res, next) {
     try {
-        const params = { ...req.body };
+        const {login, email, password} = req.body;
         const { id: userId } = req.params;
 
-        if (params.login) {
-            if (!Validator.isValidLogin(params.login)) {
+        let updates = {};
+
+        if (login) {
+            if (!Validator.isValidLogin(login)) {
                 return res.status(400).json({ message: "Invalid login!" });
             }
 
-            const existingLogins = await User.getAll({ login: params.login });
+            const existingLogins = await User.getAll({ login: login });
             if (existingLogins.some(u => u.id !== parseInt(userId))) {
                 return res.status(400).json({ message: "Login already in use!" });
             }
+            updates.login = login;
         }
 
-        if (params.email) {
-            if (!Validator.isValidEmail(params.email)) {
+        if (email) {
+            if (!Validator.isValidEmail(email)) {
                 return res.status(400).json({ error: "Invalid email!" });
             }
 
-            const existingEmails = await User.getAll({ email: params.email });
+            const existingEmails = await User.getAll({ email: email });
             if (existingEmails.some(u => u.id !== parseInt(userId))) {
                 return res.status(400).json({ message: "Email already in use!" });
             }
+            updates.email = email;
         }
 
-        if (params.password) {
-            if (!Validator.isValidPassword(params.password)) {
+        if (password) {
+            if (!Validator.isValidPassword(password)) {
                 return res.status(400).json({ message: "Invalid password!" });
             }
+            updates.password = password;
         }
 
+        req.updates = updates;
         next();
     } catch (err) {
         next(err);

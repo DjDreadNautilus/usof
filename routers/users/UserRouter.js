@@ -12,9 +12,9 @@ import User from "../../models/User.js";
 router.get("/", UserController.getAll);
 router.post("/", validateSignup, UserController.createUser);
 router.get("/:user_id", UserController.getById);
-router.delete("/:user_id", authenticateAccessToken, checkRights(User, "user_id"), UserController.delete);
+router.delete("/:user_id", authenticateAccessToken, UserController.delete);
 
-router.patch("/avatar", authenticateAccessToken, checkRights(User, "user_id"), fileUpload, UserController.updateAvatar);
-router.patch("/:user_id", authenticateAccessToken, checkRights(User, "user_id"), validateUserUpdate, UserController.updateUser);
+router.patch("/avatar", authenticateAccessToken, fileUpload, UserController.updateAvatar);
+router.patch("/:user_id", authenticateAccessToken, validateUserUpdate, UserController.updateUser);
 
 export default router;

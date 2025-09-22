@@ -8,14 +8,13 @@ class CommentController extends Likable {
 
     async updateComment(req, res) {
         try {
-            const { comment_id } = req.params;
-            const comment = await Comment.find({ id: comment_id });
+            const comment = req.comment;
 
             if (!comment) {
                 return res.status(404).json({ error: "Comment not found" });
             }
 
-            const updates = { ...req.body };
+            const updates = req.updates;
             await comment.update(updates);
 
             res.json({ status: "Success!", message: "Comment updated!" });

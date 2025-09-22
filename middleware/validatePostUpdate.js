@@ -5,13 +5,15 @@ import Category from "../models/Category.js";
 export async function validatePostUpdate(req, res, next) {
     try {
         const { post_id } = req.params;
-
+        const user = req.user;
         const { title, content, categories, status } = req.body;
 
-        const existingPost = await Post.find({ id: post_id });
-        if (!existingPost) {
+        const post = await Post.find({ id: post_id });
+        if (!post) {
             return res.status(404).json({ message: "Post not found" });
         }
+
+        let updates = {};
 
         if (title !== undefined) {
             if (!Validator.isNonEmptyString(title)) {
@@ -20,6 +22,7 @@ export async function validatePostUpdate(req, res, next) {
             if (title.length < 3) {
                 return res.status(400).json({ message: "Title must be at least 3 characters long." });
             }
+            updates.title = title;
         }
 
         if (content !== undefined) {
@@ -32,40 +35,43 @@ export async function validatePostUpdate(req, res, next) {
             if (content.length > 500) {
                 return res.status(400).json({ message: "Content is too long ( longer that 500ch)" });
             }
+            updates.content = content;  
         }
-
-        let categoryIds = [];
 
         if (categories !== undefined) {
             if (!Array.isArray(categories)) {
                 return res.status(400).json({ message: "Categories must be an array." });
             }
 
-            categoryIds = categories
-                .map(c => parseInt(c))
-                .filter(Number.isInteger);
-        }
+            const categoryIds = categories.map(c => parseInt(c)).filter(Number.isInteger);
 
-        const existingIds = [];
-
-        for(const category of categoryIds) {
-            const current = await Category.find({ id: category });
-            if(current) {
+            const existingIds = [];
+            for (const category of categoryIds) {
+                const current = await Category.find({ id: category });
+                if (current) {
                 existingIds.push(current.id);
+                }
             }
+
+            const missingIds = categoryIds.filter(id => !existingIds.includes(id));
+                if (missingIds.length > 0) {
+                    return res.status(400).json({
+                    message: `Some categories do not exist: ${missingIds.join(", ")}`
+                    });
+                }
+
+            updates.categories = categoryIds;
         }
 
-        const missingIds = categoryIds.filter(id => !existingIds.includes(id));
-        if (missingIds.length > 0) {
-            return res.status(400).json({ message: `Some categories do not exist: ${missingIds.join(", ")}` });
-        }
-
-        if (status !== undefined) {
+        if (status !== undefined) { 
             if (!["active", "inactive"].includes(status)) {
                 return res.status(400).json({ message: "Invalid status value" });
             }
+            updates.status = status;
         }
 
+        req.updates = updates;
+        req.post = post;
         next();
     } catch (err) {
         next(err);
