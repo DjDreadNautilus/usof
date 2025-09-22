@@ -12,9 +12,10 @@ class CategoryController extends BaseController {
         try {
             const { title, description } = req.body;
 
-            if (!title) {
-                return res.status(400).json({ error: "All fields required!" });
-            }
+            const existingCategory = await Category.find({title: title});
+            if(existingCategory) {
+                return res.status(400).json({message: "Category exists!"});
+            } 
 
             const category = new Category({
                 title,
@@ -31,14 +32,13 @@ class CategoryController extends BaseController {
 
     async updateCategory(req, res) {
         try {
-            const { category_id } = req.params;
-            const category = await Category.find({ id: category_id });
+            const category = req.item;
 
             if (!category) {
                 return res.status(404).json({ error: "Category not found" });
             }
 
-            const updates = { ...req.body };
+            const updates = req.updates;
             await category.update(updates);
 
             res.json({ status: "Success!", message: "Category updated!" });

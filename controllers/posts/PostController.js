@@ -12,7 +12,7 @@ class PostController extends Likable {
     async createPost(req, res) {
         try {
             console.log(req.postData);
-            const { title, content, categories } = req.postData;
+            const { title, content, categories } = req.updates;
             const user = req.user;
 
             const post = new Post({
@@ -38,11 +38,10 @@ class PostController extends Likable {
         try {
             const { post_id } = req.params;
 
-            const post = req.post;
+            const post = req.item;
 
-            const updates = req.updates;
-            const categories = updates.categories;
-
+            const { categories, ...updates } = req.updates;
+            
             post.update(updates);
 
             if (categories) {

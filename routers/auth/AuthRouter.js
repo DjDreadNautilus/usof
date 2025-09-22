@@ -1,15 +1,24 @@
 import express from "express";
 const router = express.Router();
 
-import { validateLogin } from "../../middleware/auth/validateLogin.js";
-import { validateSignup } from "../../middleware/auth/validateSignup.js";
+import { validateAuth } from "../../middleware/auth/validateAuth.js";
 import authController from "../../controllers/auth/authController.js";
 import resetPasswordController from "../../controllers/auth/resetPasswordController.js";
 import { authenticateAccessToken } from "../../middleware/auth/authenticateAccessToken.js";
 import { validatePasswordReset } from "../../middleware/auth/validatePasswordReset.js";
 
-router.post("/register", validateSignup, authController.signup);
-router.post("/login", validateLogin, authController.login);
+import { validateLogin } from "../../middleware/validation/validateLogin.js";
+import { validateEmail } from "../../middleware/validation/validateEmail.js";
+import { validatePassword } from "../../middleware/validation/validatePassword.js";
+
+router.post("/register", 
+    validateLogin,
+    validateEmail,
+    validatePassword,
+    authController.signup
+);
+
+router.post("/login", validateAuth, authController.login);
 router.post("/logout", authenticateAccessToken, authController.logout);
 
 router.post("/password-reset", resetPasswordController.sendResetMail);

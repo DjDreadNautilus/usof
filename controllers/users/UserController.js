@@ -9,7 +9,8 @@ class UserController extends BaseController {
 
     async createUser(req, res) {
         try {
-            const { login, fullname, password, email, role } = req.body;
+            const { login, password, email, role } = req.updates;
+            const {fullname} = req.body;
 
             const hashedPassword = await Hash.hash(password, 10);
             const user = new User({
@@ -31,14 +32,14 @@ class UserController extends BaseController {
 
     async updateUser(req, res) {
         try {
-            const { user_id } = req.params;
-            const user = await User.find({ id: user_id });
-
+            const user = req.item;
+            console.log(user);
             if (!user) {
                 return res.status(404).json({ error: "User not found" });
             }
 
             const updates = req.updates;
+            console.log(updates)
 
             if (updates.password) {
                 updates.password = await Hash.hash(updates.password, 10);
@@ -46,7 +47,7 @@ class UserController extends BaseController {
 
             await user.update(updates);
 
-            res.json({ status: "Success", message: "User updated!" });
+            res.status(200).json({ status: "Success", message: "User updated!" });
         } catch (err) {
             res.status(500).json({ error: err.message });
         }

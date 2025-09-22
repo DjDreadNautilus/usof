@@ -24,7 +24,12 @@ class AuthController {
 
     signup = async (req, res) => {
         try {
-            const { login, fullname, password, email } = req.body;
+            const { login, password, email } = req.updates;
+            const {fullname, confirmation} = req.body;
+
+            if(password !== confirmation) {
+                return res.status(400).json({message: "Passwords do not match"});
+            }
 
             const hashedPassword = await Hash.hash(password, 10);
             const user = new User({ login, fullname, password: hashedPassword, email, role: "user", rating: 0 });

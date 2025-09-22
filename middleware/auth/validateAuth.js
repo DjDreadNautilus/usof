@@ -1,7 +1,7 @@
 import User from "../../models/User.js";
 import Hash from "../../services/Hash.js";
 
-export async function validateLogin(req, res, next) {
+export async function validateAuth(req, res, next) {
     const { login, password, email } = req.body;
 
     if (!login || !password || !email) {

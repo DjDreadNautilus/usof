@@ -40,6 +40,10 @@ class Model {
         if (!this.id) return; 
         const keys = Object.keys(attributes);
         const values = Object.values(attributes);
+        
+        if (keys.length === 0) {
+            return;
+        }
 
         const updates = keys.map(key => `${key} = ?`).join(", ");
         const sql = `UPDATE ${this.constructor.table_name} SET ${updates} WHERE id = ?`;

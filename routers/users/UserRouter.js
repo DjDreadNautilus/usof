@@ -2,19 +2,37 @@ import express from "express";
 const router = express.Router();
 
 import UserController from "../../controllers/users/UserController.js";
-import { validateUserUpdate } from "../../middleware/validateUserUpdate.js";
-import { validateSignup } from "../../middleware/auth/validateSignup.js";
 import fileUpload from "../../middleware/fileUpload.js";
 import { authenticateAccessToken } from "../../middleware/auth/authenticateAccessToken.js";
-import checkRights from "../../middleware/checkRights.js";
 import User from "../../models/User.js";
+import { validateLogin } from "../../middleware/validation/validateLogin.js";
+import { validateEmail } from "../../middleware/validation/validateEmail.js";
+import { validatePassword } from "../../middleware/validation/validatePassword.js";
+import checkAuthor from "../../middleware/checkAuthor.js";
+import { checkItem } from "../../middleware/validation/checkItem.js";
 
-router.get("/", UserController.getAll);
-router.post("/", validateSignup, UserController.createUser);
-router.get("/:user_id", UserController.getById);
-router.delete("/:user_id", authenticateAccessToken, UserController.delete);
+router.delete("/:user_id",
+    authenticateAccessToken,
+    checkItem(User, "user_id"),
+    checkAuthor(User),
+    UserController.delete
+);
 
-router.patch("/avatar", authenticateAccessToken, fileUpload, UserController.updateAvatar);
-router.patch("/:user_id", authenticateAccessToken, validateUserUpdate, UserController.updateUser);
+router.patch("/avatar",
+    authenticateAccessToken,
+    checkItem(User, "user_id"),
+    checkAuthor(User),
+    fileUpload,
+    UserController.updateAvatar
+);
+
+router.patch("/:user_id", 
+    authenticateAccessToken, 
+    checkItem(User, "user_id"),
+    checkAuthor(User),
+    validateLogin, 
+    validateEmail,
+    validatePassword,
+    UserController.updateUser);
 
 export default router;

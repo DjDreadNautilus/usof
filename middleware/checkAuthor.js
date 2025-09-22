@@ -1,20 +1,15 @@
-function checkRights(model, param = "id") {
+function checkAuthor(model) {
     return async (req, res, next) => {
         try {
             const user = req.user;
-            
-            const item = await model.find({id: req.params[param]});
-
-            if(!item) { 
-                return res.status(404).json({message: "Item not found"});
-            }
+            const item = req.item;
 
             if (model.table_name === "users" && item.id === user.user_id) {
-                return next();
+                return next()
             }
 
             if (item.user_id && item.user_id === user.user_id) {
-                return next();
+                return next()
             }
 
             return res.status(403).json({message: "Forbidden"});
@@ -24,4 +19,4 @@ function checkRights(model, param = "id") {
     }   
 }
 
-export default checkRights;
+export default checkAuthor;
