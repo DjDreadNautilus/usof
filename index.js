@@ -1,6 +1,3 @@
-<<<<<<< Updated upstream
-const express = require("express");
-=======
 import express from "express";
 import http from "http";
 import cookieParser from "cookie-parser";
@@ -13,7 +10,6 @@ import router from "./routers/MainRouter.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
->>>>>>> Stashed changes
 import express from "express";
 import http from "http";
 import cookieParser from "cookie-parser";
