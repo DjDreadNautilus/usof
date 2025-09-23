@@ -11,31 +11,40 @@ class BaseController {
             const items = await this.model.getAll({});
             res.json(items);
         } catch (err) {
-            res.status(500).json({error: err.message});
+            res.status(500).json({ error: err.message });
         }
-    }
+    };
 
     getById = async (req, res) => {
         try {
             const id = Object.values(req.params)[0];
-            const item = await this.model.find({id: id});
+            const item = await this.model.find({ id });
+
+            if (!item) {
+                return res.status(404).json({ error: "Not found" });
+            }
+
             res.json(item);
         } catch (err) {
-            res.status(500).json({error: err.message})
+            res.status(500).json({ error: err.message });
         }
-    }
+    };
 
     delete = async (req, res) => {
         try {
-            const id = Object.values(req.params)[0]; 
-            const item = await this.model.find({id: id});
-            if (!item) return res.status(404).json({ error: "Not found" });
+            const id = Object.values(req.params)[0];
+            const item = await this.model.find({ id });
+
+            if (!item) {
+                return res.status(404).json({ error: "Not found" });
+            }
+
             await item.delete();
-            res.json({message: "Deleted."});
-        } catch(err) {
-            res.status(500).json({error: err.message});
+            res.json({ status: "Success", message: "Deleted" });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
         }
-    }
+    };
 }
 
-module.exports = BaseController;
+export default BaseController;

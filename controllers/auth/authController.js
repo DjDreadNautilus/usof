@@ -1,59 +1,61 @@
-const tokenService = require("../../services/tokenService");
-const Hash = require("../../services/Hash");
-const User = require("../../models/User");
+import tokenService from "../../services/tokenService.js";
+import Hash from "../../services/Hash.js";
+import User from "../../models/User.js";
 
-const loginController = {
-
-    login: async (req, res) => {
+class AuthController {
+    login = async (req, res) => {
         try {
-            const refreshToken = await tokenService.createRefreshToken({user_id: req.user.id, role: req.user.role});
+            const refreshToken = await tokenService.createRefreshToken({ user_id: req.user.id, role: req.user.role });
             const accessToken = tokenService.createAccessToken(req.user);
 
             res.cookie("refreshToken", refreshToken, {
-                httpOnly: true,   
+                httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "Strict",
                 maxAge: 10 * 24 * 60 * 60 * 1000
-            })
+            });
 
-            res.status(200).json({message: "Loged in!", accessToken: accessToken});
-
+            res.status(200).json({ message: "Logged in!", accessToken });
         } catch (err) {
             console.error("Error during login:", err);
-            res.status(500).send({error: "Internal Server Error!"});
+            res.status(500).json({ error: "Internal Server Error!" });
         }
-    },
+    }
 
-    signup: async (req, res) => {
+    signup = async (req, res) => {
         try {
-            const {login, fullname, password, email} = req.body;
+            const { login, password, email } = req.updates;
+            const {fullname, confirmation} = req.body;
+
+            if(password !== confirmation) {
+                return res.status(400).json({message: "Passwords do not match"});
+            }
 
             const hashedPassword = await Hash.hash(password, 10);
-            const user = new User({login: login, fullname: fullname, password: hashedPassword, email: email, role: "user", rating: 0});
+            const user = new User({ login, fullname, password: hashedPassword, email, role: "user", rating: 0 });
             await user.save();
 
             res.status(200).json({ message: "Registered!" });
-            res.end;
-
         } catch (err) {
             console.error("Error during signup:", err);
-            res.status(500).send({error: "Internal Server Error!"});
+            res.status(500).json({ error: "Internal Server Error!" });
         }
-    },
+    }
 
-    logout: async (req, res) => {
+    logout = async (req, res) => {
         try {
             const refreshToken = req.cookies.refreshToken;
-            const user = tokenService.verifyToken(refreshToken);
+            if (!refreshToken) return res.status(400).json({ error: "No refresh token provided" });
+
+            const user = await tokenService.verifyToken(refreshToken);
 
             const tokens = await tokenService.findTokensByUserID(user.user_id);
 
             let storedToken = null;
-            for(const token of tokens) {
-                isMatch = await Hash.compareHash(refreshToken, token.token);
-                if(isMatch) {
+            for (const token of tokens) {
+                const isMatch = await Hash.compareHash(refreshToken, token.token);
+                if (isMatch) {
                     storedToken = token;
-                    console.log(storedToken);
                     break;
                 }
             }
@@ -76,4 +78,4 @@ const loginController = {
     }
 }
 
-module.exports = loginController;
+export default new AuthController();

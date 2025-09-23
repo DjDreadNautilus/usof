@@ -1,16 +1,18 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
 
-const AuthRouter = require("./auth/AuthRouter");
-const UserRouter = require("./users/UserRouter");
-const CategoryRouter = require("./posts/CategoryRouter");
-const PostRouter = require("./posts/PostRouter");
-const CommentRouter = require("./posts/CommentRouter");
+import AuthRouter from "./auth/AuthRouter.js";
+import UserRouter from "./users/UserRouter.js";
+import CategoryRouter from "./posts/CategoryRouter.js";
+import PostRouter from "./posts/PostRouter.js";
+import CommentRouter from "./posts/CommentRouter.js";
+import AdminRouter from "./AdminRouter.js";
 
 router.use("/auth", AuthRouter);
 router.use("/users", UserRouter);
 router.use("/categories", CategoryRouter);
 router.use("/posts", PostRouter);
 router.use("/comments", CommentRouter);
+router.use("/admin", AdminRouter)
 
-module.exports = router;
+export default router;

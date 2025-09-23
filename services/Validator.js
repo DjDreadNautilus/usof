@@ -13,4 +13,7 @@ function isValidEmail(email) {
     return regex.test(email);
 }
 
-module.exports = {isValidPassword, isValidLogin, isValidEmail};
+function isNonEmptyString(value) {
+    return typeof value === "string" && value.trim().length > 0;
+}
+export default {isValidPassword, isValidEmail, isValidLogin, isNonEmptyString}

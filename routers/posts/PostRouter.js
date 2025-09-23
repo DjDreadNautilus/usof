@@ -1,20 +1,63 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const PostController = require("../../controllers/posts/PostController");
 
-const {authenticateAccessToken} = require("../../middleware/auth/authenticateAccessToken");
+import Post from "../../models/Posts.js";
+import PostController from "../../controllers/posts/PostController.js";
 
-router.get("/", PostController.getAll);
-router.get("/:category_id", PostController.getById);
-router.get("/:post_id/categories", PostController.getCategories)
+import { authenticateAccessToken } from "../../middleware/auth/authenticateAccessToken.js";
+
+import { checkItem } from "../../middleware/validation/checkItem.js";
+import checkAuthor from "../../middleware/checkAuthor.js";
+import { validateTitle } from "../../middleware/validation/validateTitle.js";
+import { validateContent } from "../../middleware/validation/validateContent.js";
+import { validateCategories } from "../../middleware/validation/validateCategories.js";
+import { validateStatus } from "../../middleware/validation/validateStatus.js";
+
+router.get("/", PostController.getAllFiltered);
+router.get("/:post_id", PostController.getById);
 router.get("/:post_id/comments", PostController.getComments);
-router.get("/:post_id/like", PostController.getLikes);
 
-router.post("/", authenticateAccessToken, PostController.createPost);
-router.post("/:post_id/comments", authenticateAccessToken, PostController.createComment);
-router.post("/:post_id/like", authenticateAccessToken, PostController.createLike);
+router.post("/", 
+    authenticateAccessToken, 
+    validateTitle,
+    validateContent,
+    validateCategories, 
+    PostController.createPost
+);
 
-router.delete("/:post_id/like", authenticateAccessToken, PostController.deleteLike);
-router.delete("/:post_id", PostController.delete);
+router.post("/:post_id/comments", 
+    authenticateAccessToken, 
+    checkItem(Post, "post_id"),
+    validateContent, 
+    PostController.createComment
+);
 
-module.exports = router;
+router.post("/:post_id/like",
+    authenticateAccessToken,
+    checkItem(Post, "post_id"),
+    PostController.createLike);
+
+router.patch("/:post_id",
+    authenticateAccessToken,
+    checkItem(Post, "post_id"),
+    checkAuthor(Post),
+    validateTitle,
+    validateContent,
+    validateCategories,
+    validateStatus,
+    PostController.updatePost
+);
+
+router.delete("/:post_id/like",
+    authenticateAccessToken,
+    checkItem(Post, "post_id"),
+    PostController.deleteLike
+);
+
+router.delete("/:post_id", 
+    authenticateAccessToken,
+    checkItem(Post, "post_id"),
+    checkAuthor(Post, "post_id"),
+    PostController.delete);
+
+export default router;
