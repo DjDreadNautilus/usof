@@ -1,106 +1,157 @@
-const Category = require("../../models/Category");
-const PostCategories = require("../../models/PostCategories");
-const Post = require("../../models/Posts");
-const Likable = require("../Likable");
-const Comment = require("../../models/Comment");
-const Like = require("../../models/Like");
-
+import Category from "../../models/Category.js";
+import PostCategories from "../../models/PostCategories.js";
+import Post from "../../models/Posts.js";
+import Likable from "../Likable.js";
+import Comment from "../../models/Comment.js";
 
 class PostController extends Likable {
     constructor() {
         super(Post, "post_id");
     }
 
-    async createPost(req, res) {
+    createPost = async (req, res) => {
         try {
-            const {title, content, categories} = req.body;
+            console.log(req.postData);
+            const { title, content, categories } = req.updates;
             const user = req.user;
 
-            if(!title || !content || !categories) {
-                return res.status(400).json({error: "all fields required!"});
-            }
-
-            console.log(categories);
-
-            const post = new Post({user_id: user.user_id, title: title, content: content, status: "active"});
+            const post = new Post({
+                user_id: user.user_id,
+                title,
+                content,
+                status: "active"
+            });
             await post.save();
-            console.log(post.id);
 
-            for(const category of categories) {
-                const relatoin = new PostCategories({post_id: post.id, category_id: category});
-                await relatoin.save();
-                console.log(relatoin);
+            for (const category of categories) {
+                const relation = new PostCategories({ post_id: post.id, category_id: category });
+                await relation.save();
             }
 
-            res.status(200).json({post: post, message: "Successfully created a post!"});
-        } catch(err) {
-            res.status(500).json({error: err.message});
+            res.status(200).json({ post, message: "Successfully created a post!" });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
         }
     }
 
-    async getCategories(req, res) {
+    updatePost = async (req, res) => {
         try {
-            const id = req.params.post_id;
+            const { post_id } = req.params;
 
-            const relations = await PostCategories.getAll({ post_id: id });
+            const post = req.item;
+
+            const { categories, ...updates } = req.updates;
+            
+            post.update(updates);
+
+            if (categories) {
+
+                await PostCategories.deleteAll({post_id: post_id});
+
+                for (const category_id of categories) {
+                    const relation = new PostCategories({ post_id, category_id });
+                    await relation.save();
+                }
+            }
+
+            res.status(200).json({message: "Post updated"});
+        } catch(err) {
+            res.status(500).json({ error: err.message });
+        }
+    }
+
+
+    getCategories = async (req, res) => {
+        try {
+            const { post_id } = req.params;
+
+            const relations = await PostCategories.getAll({ post_id: post_id });
             const ids = relations.map(r => r.category_id);
 
             const categories = await Category.getAll({ id: ids });
 
-            res.status(200).json({categories: categories, message: "Got categories from post!"});
-        } catch(err) {
-           res.status(500).json({error: err.message}); 
+            res.status(200).json({ categories, message: "Got categories from post!" });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
         }
     }
 
-    async createComment(req, res) {
+    createComment = async (req, res) => {
         try {
-            const id = req.params.post_id;
+            const post = req.item;
+            if(post.status === "inactive") {
+                return res.status(400).json({message: "Post is not available"});
+            }
+            
             const user = req.user;
-            const content = req.body.content;
+            const { content } = req.updates;
 
-            if(!content) {
-                res.status(400).json({error: "Empty comment"});
+            if (!content) {
+                return res.status(400).json({ error: "Empty comment" });
             }
 
-            const comment = new Comment({user_id: user.user_id, post_id: id, content: content, created_at: new Date()});
-            console.log(comment);
-            
-            comment.save();
+            const comment = new Comment({
+                user_id: user.user_id,
+                post_id: post.id,
+                content: content,
+                created_at: new Date()
+            });
+
+            await comment.save();
 
             res.status(200).json(comment);
-        } catch(err) {
-            res.status(500).json({error: err.message}); 
+        } catch (err) {
+            res.status(500).json({ error: err.message });
         }
     }
 
     async getComments(req, res) {
         try {
-            const id = req.params.post_id;
+            const { post_id } = req.params;
 
-            const comments = await Comment.getAll({ post_id: id });
+            const comments = await Comment.getAll({ post_id: post_id });
 
-            res.status(200).json({comments: comments, message: "Got comments from post!"});
-        } catch(err) {
-           res.status(500).json({error: err.message}); 
+            res.status(200).json({ comments, message: "Got comments from post!" });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
         }
     }
 
-    getAll = async (req, res) => {
+    getAllFiltered = async (req, res) => {
         try {
-            const page = parseInt(req.query.page) || 1; 
-            const limit = parseInt(req.query.limit) || 5;   
-            const offset = (page - 1) * limit;   
-            const orderBy = req.query.orderBy;
-            const order = req.query.order || "ASC";
+            const query = req.query;
+            console.log(query);
 
-            const posts = await Post.getAll({limit: limit, offset: offset, orderBy: orderBy, order: order});
+            let category_ids = [];
+            if (query.category_ids) {
+                category_ids = query.category_ids.split(",").map(id => parseInt(id));
+            }   
 
+            const limit = query.limit ? parseInt(query.limit) : 5;
+            const page = query.page ? parseInt(query.page) : 1;
+            const offset = (page - 1) * limit
+
+            const filters = {
+                category_ids,
+                status: "active",
+                user_id: query.user_id ? parseInt(query.user_id) : undefined,
+                created_from: query.created_from,
+                created_to: query.created_to,
+                order_by: query.order_by,
+                order: query.order,
+                limit: limit,
+                offset: offset
+            };
+
+            Object.keys(filters).forEach(key => filters[key] === undefined && delete filters[key]);
+            console.log(filters);
+
+            const posts = await Post.filter(filters);
             res.json(posts);
-        } catch(err) {
-           res.status(500).json({error: err.message}); 
+        } catch (err) {
+            res.status(500).json({ error: err.message });
         }
     }
 }
 
-module.exports = new PostController();
+export default new PostController();

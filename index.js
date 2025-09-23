@@ -14,12 +14,19 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 >>>>>>> Stashed changes
-const app = express();
-const http = require("http").createServer(app);
-const cookieParser = require("cookie-parser")
-const path = require("path");
+import express from "express";
+import http from "http";
+import cookieParser from "cookie-parser";
+import path from "path";
+import { fileURLToPath } from "url";
 
-const router = require("./routers/MainRouter");
+import router from "./routers/MainRouter.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+const server = http.createServer(app);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

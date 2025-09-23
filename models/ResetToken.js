@@ -1,4 +1,4 @@
-const Model = require("./Model");
+import Model from "./Model.js";
 
 class ResetToken extends Model {
     static table_name = "reset_tokens";
@@ -8,4 +8,4 @@ class ResetToken extends Model {
     }
 }
 
-module.exports = ResetToken;
+export default ResetToken;

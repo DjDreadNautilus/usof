@@ -1,4 +1,4 @@
-const Model = require("./Model");
+import Model from "./Model.js";
 
 class Like extends Model {
     static table_name = "likes";
@@ -8,4 +8,4 @@ class Like extends Model {
     }
 }
 
-module.exports = Like;
+export default Like;

@@ -1,19 +1,28 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
 
-const {validateLogin} = require("../../middleware/auth/validateLogin");
-const {validateSignup} = require("../../middleware/auth/validateSignup");
+import { authenticateAccessToken } from "../../middleware/auth/authenticateAccessToken.js";
 
-const authController = require("../../controllers/auth/authController");
-const resetPasswordController = require("../../controllers/auth/resetPasswordController");
-const {authenticateAccessToken} = require("../../middleware/auth/authenticateAccessToken");
-const {validatePasswordReset} = require("../../middleware/auth/validatePasswordReset");
+import authController from "../../controllers/auth/authController.js";
+import resetPasswordController from "../../controllers/auth/resetPasswordController.js";
 
-router.post("/register", validateSignup, authController.signup);
-router.post("/login", validateLogin, authController.login);
+import { validatePasswordReset } from "../../middleware/auth/validatePasswordReset.js";
+import { validateAuth } from "../../middleware/auth/validateAuth.js";
+import { validateLogin } from "../../middleware/validation/validateLogin.js";
+import { validateEmail } from "../../middleware/validation/validateEmail.js";
+import { validatePassword } from "../../middleware/validation/validatePassword.js";
+
+router.post("/register", 
+    validateLogin,
+    validateEmail,
+    validatePassword,
+    authController.signup
+);
+
+router.post("/login", validateAuth, authController.login);
 router.post("/logout", authenticateAccessToken, authController.logout);
 
 router.post("/password-reset", resetPasswordController.sendResetMail);
 router.post("/password-reset/:confirm_token", validatePasswordReset, resetPasswordController.resetPassword);
 
-module.exports = router;
+export default router;

@@ -1,41 +1,38 @@
-const Validator = require("../../services/Validator");
-const ResetToken = require("../../models/ResetToken");
-const User = require("../../models/User");
+import Validator from "../../services/Validator.js";
+import ResetToken from "../../models/ResetToken.js";
+import User from "../../models/User.js";
 
-async function validatePasswordReset(req, res, next) {
-    const confirmToken = req.params.confirm_token;
-    const password = req.body.password;
-    const confirmation = req.body.confirmation
+export async function validatePasswordReset(req, res, next) {
+    const { confirm_token } = req.params;
+    const { password, confirmation } = req.body;
 
-    const token = await ResetToken.find({token: confirmToken});
-    
-    if(!token) {
-        return res.status(401).json({error: "Reset token missing!"});
+    const token = await ResetToken.find({ token: confirm_token });
+
+    if (!token) {
+        return res.status(401).json({ error: "Reset token missing!" });
     }
 
     if (new Date(token.expiration_date).getTime() < Date.now()) {
-        token.delete();
+        await token.delete();
         return res.status(403).json({ error: "Invalid or expired reset token" });
     }
 
-    const user = await User.find({email: token.user_email});
-    if(!user) {
-        token.delete();
-        return res.status(401).json({error: "User with this email not found!"});
+    const user = await User.find({ email: token.user_email });
+    if (!user) {
+        await token.delete();
+        return res.status(401).json({ error: "User with this email not found!" });
     }
 
-    if(!Validator.isValidPassword(password)) {
-        return res.status(400).json({error: "Invalid password!"});
+    if (!Validator.isValidPassword(password)) {
+        return res.status(400).json({ error: "Invalid password!" });
     }
 
-    if(password !== confirmation) {
-        return res.status(400).json({error: "Passwords do not match!"});
+    if (password !== confirmation) {
+        return res.status(400).json({ error: "Passwords do not match!" });
     }
 
-    token.delete();
+    await token.delete();
 
     req.user = user;
     next();
 }
-
-module.exports = {validatePasswordReset};

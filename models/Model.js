@@ -1,5 +1,5 @@
-const pool = require("../db/pool")
-const QuerryBuilder = require("./QuerryBuilder");
+import pool from "../db/pool.js";
+import QuerryBuilder from "./QuerryBuilder.js";
  
 class Model {
     constructor(attributes = {}) {
@@ -22,10 +22,28 @@ class Model {
         return rows.map(row => new this(row));
     }
 
+    static async deleteAll(options = {}) {
+        const keys = Object.keys(options);
+        const values = Object.values(options);
+
+        if (!keys.length) {
+            throw new Error("No conditions provided for deleteAll — refusing to delete all rows.");
+        }
+
+        const whereClause = keys.map(key => `${key} = ?`).join(" AND ");
+        const sql = `DELETE FROM ${this.table_name} WHERE ${whereClause}`;
+
+        await pool.execute(sql, values);
+    }
+
     async update(attributes = {}) {
         if (!this.id) return; 
         const keys = Object.keys(attributes);
         const values = Object.values(attributes);
+        
+        if (keys.length === 0) {
+            return;
+        }
 
         const updates = keys.map(key => `${key} = ?`).join(", ");
         const sql = `UPDATE ${this.constructor.table_name} SET ${updates} WHERE id = ?`;
@@ -51,4 +69,4 @@ class Model {
 
 }
 
-module.exports = Model;
+export default Model;

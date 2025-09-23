@@ -1,6 +1,6 @@
-const User = require("../../models/User");
-const BaseController = require("../BaseController");
-const Hash = require("../../services/Hash");
+import User from "../../models/User.js";
+import BaseController from "../BaseController.js";
+import Hash from "../../services/Hash.js";
 
 class UserController extends BaseController {
     constructor() {
@@ -9,28 +9,37 @@ class UserController extends BaseController {
 
     async createUser(req, res) {
         try {
-            const {login, fullname, password, email, role} = req.body;
+            const { login, password, email, role } = req.updates;
+            const {fullname} = req.body;
 
             const hashedPassword = await Hash.hash(password, 10);
-            const user = new User({login: login, fullname: fullname, password: hashedPassword, email: email, role: role !== null ? role : "user", rating: 0});
+            const user = new User({
+                login,
+                fullname,
+                password: hashedPassword,
+                email,
+                role: role ?? "user",
+                rating: 0
+            });
+
             await user.save();
 
-            res.json({status: "Success!", message: "User created!", });
-        } catch(err) {
-            res.status(500).json({error: err.message})
+            res.status(201).json({ status: "Success", message: "User created!", user });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
         }
-    } 
+    }
 
     async updateUser(req, res) {
         try {
-            const userId = req.params.user_id;
-            const user = await User.find({ id: userId });
-
+            const user = req.item;
+            console.log(user);
             if (!user) {
                 return res.status(404).json({ error: "User not found" });
             }
 
-            const updates = { ...req.body };
+            const updates = req.updates;
+            console.log(updates)
 
             if (updates.password) {
                 updates.password = await Hash.hash(updates.password, 10);
@@ -38,28 +47,35 @@ class UserController extends BaseController {
 
             await user.update(updates);
 
-            res.json({ status: "Success!", message: "User updated!" });
+            res.status(200).json({ status: "Success", message: "User updated!" });
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
     }
 
     async updateAvatar(req, res) {
-        if (!req.file) {
-            return res.status(400).json({ error: "Avatar file is required" });
+        try {
+            if (!req.file) {
+                return res.status(400).json({ error: "Avatar file is required" });
+            }
+
+            const user = await User.find({ id: req.user.user_id });
+            if (!user) {
+                return res.status(404).json({ error: "User not found" });
+            }
+
+            const relativePath = `/uploads/avatars/${req.file.filename}`;
+            await user.update({ avatar: relativePath });
+
+            res.json({
+                status: "Success",
+                message: "Avatar uploaded successfully",
+                avatar: relativePath
+            });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
         }
-
-        console.log(req.user)
-        const user = await User.find({id: req.user.user_id});
-
-        const relativePath = `/uploads/avatars/${req.file.filename}`;
-        await user.update({ avatar: relativePath });
-
-        res.json({
-            message: "Avatar uploaded successfully",
-            avatar: relativePath,
-        });
     }
 }
 
-module.exports = new UserController();
+export default new UserController();
