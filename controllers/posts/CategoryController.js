@@ -8,7 +8,7 @@ class CategoryController extends BaseController {
         super(Category);
     }
 
-    async createCategory(req, res) {
+    createCategory = async (req, res) => {
         try {
             const { title, description } = req.body;
 
@@ -30,7 +30,7 @@ class CategoryController extends BaseController {
         }
     }
 
-    async updateCategory(req, res) {
+    updateCategory = async(req, res) => {
         try {
             const category = req.item;
 
@@ -47,7 +47,7 @@ class CategoryController extends BaseController {
         }
     }
 
-    async getPosts(req, res) {
+    getPosts = async (req, res) => {
         try {
             const { category_id } = req.params;
 

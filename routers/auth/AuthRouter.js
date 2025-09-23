@@ -1,12 +1,13 @@
 import express from "express";
 const router = express.Router();
 
-import { validateAuth } from "../../middleware/auth/validateAuth.js";
+import { authenticateAccessToken } from "../../middleware/auth/authenticateAccessToken.js";
+
 import authController from "../../controllers/auth/authController.js";
 import resetPasswordController from "../../controllers/auth/resetPasswordController.js";
-import { authenticateAccessToken } from "../../middleware/auth/authenticateAccessToken.js";
-import { validatePasswordReset } from "../../middleware/auth/validatePasswordReset.js";
 
+import { validatePasswordReset } from "../../middleware/auth/validatePasswordReset.js";
+import { validateAuth } from "../../middleware/auth/validateAuth.js";
 import { validateLogin } from "../../middleware/validation/validateLogin.js";
 import { validateEmail } from "../../middleware/validation/validateEmail.js";
 import { validatePassword } from "../../middleware/validation/validatePassword.js";

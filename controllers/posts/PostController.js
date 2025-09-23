@@ -9,7 +9,7 @@ class PostController extends Likable {
         super(Post, "post_id");
     }
 
-    async createPost(req, res) {
+    createPost = async (req, res) => {
         try {
             console.log(req.postData);
             const { title, content, categories } = req.updates;
@@ -34,7 +34,7 @@ class PostController extends Likable {
         }
     }
 
-    async updatePost(req, res) {
+    updatePost = async (req, res) => {
         try {
             const { post_id } = req.params;
 
@@ -61,7 +61,7 @@ class PostController extends Likable {
     }
 
 
-    async getCategories(req, res) {
+    getCategories = async (req, res) => {
         try {
             const { post_id } = req.params;
 
@@ -76,15 +76,15 @@ class PostController extends Likable {
         }
     }
 
-    async createComment(req, res) {
+    createComment = async (req, res) => {
         try {
-            const { post_id } = req.params;
-            const post = await Post.find({id: post_id});
-            if(!post || post.status === "inactive") {
-                res.status(400).json({message: "Post is not available"});
+            const post = req.item;
+            if(post.status === "inactive") {
+                return res.status(400).json({message: "Post is not available"});
             }
+            
             const user = req.user;
-            const { content } = req.body;
+            const { content } = req.updates;
 
             if (!content) {
                 return res.status(400).json({ error: "Empty comment" });
@@ -92,7 +92,7 @@ class PostController extends Likable {
 
             const comment = new Comment({
                 user_id: user.user_id,
-                post_id: post_id,
+                post_id: post.id,
                 content: content,
                 created_at: new Date()
             });
@@ -117,7 +117,7 @@ class PostController extends Likable {
         }
     }
 
-    getAll = async (req, res) => {
+    getAllFiltered = async (req, res) => {
         try {
             const query = req.query;
             console.log(query);
@@ -125,7 +125,7 @@ class PostController extends Likable {
             let category_ids = [];
             if (query.category_ids) {
                 category_ids = query.category_ids.split(",").map(id => parseInt(id));
-            }
+            }   
 
             const limit = query.limit ? parseInt(query.limit) : 5;
             const page = query.page ? parseInt(query.page) : 1;
@@ -133,7 +133,7 @@ class PostController extends Likable {
 
             const filters = {
                 category_ids,
-                status: query.status,
+                status: "active",
                 user_id: query.user_id ? parseInt(query.user_id) : undefined,
                 created_from: query.created_from,
                 created_to: query.created_to,

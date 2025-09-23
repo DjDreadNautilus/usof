@@ -1,15 +1,17 @@
 import express from "express";
 const router = express.Router();
 
-import UserController from "../../controllers/users/UserController.js";
-import fileUpload from "../../middleware/fileUpload.js";
-import { authenticateAccessToken } from "../../middleware/auth/authenticateAccessToken.js";
 import User from "../../models/User.js";
+import UserController from "../../controllers/users/UserController.js";
+
+import { authenticateAccessToken } from "../../middleware/auth/authenticateAccessToken.js";
+import fileUpload from "../../middleware/fileUpload.js";
+
+import checkAuthor from "../../middleware/checkAuthor.js";
+import { checkItem } from "../../middleware/validation/checkItem.js";
 import { validateLogin } from "../../middleware/validation/validateLogin.js";
 import { validateEmail } from "../../middleware/validation/validateEmail.js";
 import { validatePassword } from "../../middleware/validation/validatePassword.js";
-import checkAuthor from "../../middleware/checkAuthor.js";
-import { checkItem } from "../../middleware/validation/checkItem.js";
 
 router.delete("/:user_id",
     authenticateAccessToken,

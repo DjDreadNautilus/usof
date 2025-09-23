@@ -1,12 +1,16 @@
 import express from "express";
 const router = express.Router();
 
-import CommentController from "../../controllers/posts/CommentController.js";
-import { authenticateAccessToken } from "../../middleware/auth/authenticateAccessToken.js";
 import Comment from "../../models/Comment.js";
-import validateCommentUpdate from "../../middleware/validateCommentUpdate.js";
+
+import CommentController from "../../controllers/posts/CommentController.js";
+
+import { authenticateAccessToken } from "../../middleware/auth/authenticateAccessToken.js";
+
 import { checkItem } from "../../middleware/validation/checkItem.js";
 import checkAuthor from "../../middleware/checkAuthor.js";
+import { validateContent } from "../../middleware/validation/validateContent.js";
+import { validateStatus } from "../../middleware/validation/validateStatus.js";
 
 router.get("/", CommentController.getAll);
 router.get("/:comment_id", CommentController.getById);
@@ -18,7 +22,8 @@ router.patch("/:comment_id",
     authenticateAccessToken, 
     checkItem(Comment, "comment_id"),
     checkAuthor(Comment),
-    validateCommentUpdate, 
+    validateContent,
+    validateStatus,
     CommentController.updateComment
 );
 
