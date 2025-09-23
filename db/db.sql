@@ -81,3 +81,45 @@ CREATE TABLE reset_tokens (
     expiration_date TIMESTAMP NOT NULL,
     FOREIGN KEY (user_email) REFERENCES users(email) ON DELETE CASCADE
 );
+
+-- Users
+INSERT INTO users (login, fullname, password, email, role)
+VALUES
+  ('admin', 'Admin User', 'hashed_password1', 'admin@example.com', 'admin'),
+  ('john', 'John Doe', 'hashed_password2', 'john@example.com', 'user'),
+  ('jane', 'Jane Smith', 'hashed_password3', 'jane@example.com', 'user');
+
+-- Categories
+INSERT INTO categories (title, description)
+VALUES
+  ('Technology', 'All about tech'),
+  ('Science', 'Scientific discussions'),
+  ('Lifestyle', 'Everything lifestyle');
+
+-- Posts
+INSERT INTO posts (title, content, user_id, status)
+VALUES
+  ('First Post', 'This is the first test post.', 1, 'active'),
+  ('Second Post', 'Another test post content.', 2, 'inactive'),
+  ('Hello World', 'Excited to join!', 3, 'active');
+
+-- Comments
+INSERT INTO comments (user_id, post_id, content)
+VALUES
+  (2, 1, 'Nice post!'),
+  (3, 1, 'Thanks for sharing.'),
+  (1, 3, 'Welcome aboard!');
+
+-- Likes
+INSERT INTO likes (post_id, user_id, type)
+VALUES
+  (1, 2, 'like'),
+  (1, 3, 'like'),
+  (3, 1, 'like');
+
+-- Post-Categories
+INSERT INTO post_categories (post_id, category_id)
+VALUES
+  (1, 1),
+  (2, 2),
+  (3, 3);

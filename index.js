@@ -1,4 +1,19 @@
+<<<<<<< Updated upstream
 const express = require("express");
+=======
+import express from "express";
+import http from "http";
+import cookieParser from "cookie-parser";
+import path from "path";
+import { fileURLToPath } from "url";
+import initDb from "./db/initDb.js";
+
+import router from "./routers/MainRouter.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+>>>>>>> Stashed changes
 const app = express();
 const http = require("http").createServer(app);
 const cookieParser = require("cookie-parser")
@@ -22,7 +37,17 @@ app.use((req, res) => {
     res.status(404).send('Route not found');
 });
 
-http.listen(8080, () => {
-    console.log("poehali!");
-})
+const start = async () => {
+  try {
+    await initDb();
 
+    server.listen(8080, () => {
+      console.log("Hello,Welcome to http://localhost:8080 happy zoo (instant show)");
+    });
+  } catch (err) {
+    console.error("Failed to initialize database:", err);
+    process.exit(1);
+  }
+};
+
+start();
