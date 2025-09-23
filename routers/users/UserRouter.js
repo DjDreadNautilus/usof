@@ -7,11 +7,14 @@ import UserController from "../../controllers/users/UserController.js";
 import { authenticateAccessToken } from "../../middleware/auth/authenticateAccessToken.js";
 import fileUpload from "../../middleware/fileUpload.js";
 
-import checkAuthor from "../../middleware/checkAuthor.js";
-import { checkItem } from "../../middleware/validation/checkItem.js";
-import { validateLogin } from "../../middleware/validation/validateLogin.js";
-import { validateEmail } from "../../middleware/validation/validateEmail.js";
-import { validatePassword } from "../../middleware/validation/validatePassword.js";
+import checkAuthor from "../../middleware/users/checkAuthor.js";
+import { checkItem } from "../../middleware/checkItem.js";
+import { validateLogin } from "../../middleware/auth/validateLogin.js";
+import { validateEmail } from "../../middleware/auth/validateEmail.js";
+import { validatePassword } from "../../middleware/auth/validatePassword.js";
+
+router.get("/", UserController.getAll);
+router.get("/:user_id", UserController.getById);
 
 router.delete("/:user_id",
     authenticateAccessToken,

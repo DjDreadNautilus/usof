@@ -1,7 +1,10 @@
 export const checkItem = (model, param) => {
     return async (req, res, next) => {
         try {
-            const id = req.params[param]
+            let id = req.user.user_id;
+            if(req.params[param]) {
+                id = req.params[param]
+            }
             const item = await model.find({id: id});
 
             if(!item) {

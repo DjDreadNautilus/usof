@@ -120,7 +120,10 @@ class PostController extends Likable {
     getAllFiltered = async (req, res) => {
         try {
             const query = req.query;
-            console.log(query);
+            let status = "active";
+            if(req.user && req.user.role === "admin") {
+                status = ""
+            }
 
             let category_ids = [];
             if (query.category_ids) {
@@ -133,7 +136,7 @@ class PostController extends Likable {
 
             const filters = {
                 category_ids,
-                status: "active",
+                status: status,
                 user_id: query.user_id ? parseInt(query.user_id) : undefined,
                 created_from: query.created_from,
                 created_to: query.created_to,

@@ -58,7 +58,7 @@ class UserController extends BaseController {
             if (!req.file) {
                 return res.status(400).json({ error: "Avatar file is required" });
             }
-
+            
             const user = await User.find({ id: req.user.user_id });
             if (!user) {
                 return res.status(404).json({ error: "User not found" });

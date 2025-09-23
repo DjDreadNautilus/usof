@@ -7,16 +7,26 @@ import CommentController from "../../controllers/posts/CommentController.js";
 
 import { authenticateAccessToken } from "../../middleware/auth/authenticateAccessToken.js";
 
-import { checkItem } from "../../middleware/validation/checkItem.js";
-import checkAuthor from "../../middleware/checkAuthor.js";
-import { validateContent } from "../../middleware/validation/validateContent.js";
-import { validateStatus } from "../../middleware/validation/validateStatus.js";
+import { checkItem } from "../../middleware/checkItem.js";
+import checkAuthor from "../../middleware/users/checkAuthor.js";
+import { validateContent } from "../../middleware/posts/validateContent.js";
+import { validateStatus } from "../../middleware/posts/validateStatus.js";
 
 router.get("/", CommentController.getAll);
 router.get("/:comment_id", CommentController.getById);
 router.get("/:comment_id/like", CommentController.getLikes);
 
-router.post("/:comment_id/like", authenticateAccessToken, CommentController.createLike);
+router.post("/:comment_id/like", 
+    authenticateAccessToken,
+    checkItem(Comment, "comment_id"),
+    CommentController.createLike
+);
+
+router.delete("/:comment_id/like",
+    authenticateAccessToken,
+    checkItem(Comment, "comment_id"),
+    CommentController.deleteLike
+);
 
 router.patch("/:comment_id",
     authenticateAccessToken, 
@@ -33,7 +43,5 @@ router.delete("/:comment_id",
     checkAuthor(Comment), 
     CommentController.delete
 );
-
-router.delete("/:comment_id/like", CommentController.deleteLike);
 
 export default router;  

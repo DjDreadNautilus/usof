@@ -8,9 +8,9 @@ import resetPasswordController from "../../controllers/auth/resetPasswordControl
 
 import { validatePasswordReset } from "../../middleware/auth/validatePasswordReset.js";
 import { validateAuth } from "../../middleware/auth/validateAuth.js";
-import { validateLogin } from "../../middleware/validation/validateLogin.js";
-import { validateEmail } from "../../middleware/validation/validateEmail.js";
-import { validatePassword } from "../../middleware/validation/validatePassword.js";
+import { validateLogin } from "../../middleware/auth/validateLogin.js";
+import { validateEmail } from "../../middleware/auth/validateEmail.js";
+import { validatePassword } from "../../middleware/auth/validatePassword.js";
 
 router.post("/register", 
     validateLogin,

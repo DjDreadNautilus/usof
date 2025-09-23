@@ -85,7 +85,7 @@ CREATE TABLE reset_tokens (
 -- Users
 INSERT INTO users (login, fullname, password, email, role)
 VALUES
-  ('admin', 'Admin User', 'hashed_password1', 'admin@example.com', 'admin'),
+  ('admin', 'Admin User', '$2b$10$v9bRqeGl.rWUJgC6t/2B7uGcKq4iQ2C1ohdu5u/t/uFDjpGU0ixR.', 'admin@example.com', 'admin'),
   ('john', 'John Doe', 'hashed_password2', 'john@example.com', 'user'),
   ('jane', 'Jane Smith', 'hashed_password3', 'jane@example.com', 'user');
 

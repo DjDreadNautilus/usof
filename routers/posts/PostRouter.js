@@ -6,16 +6,18 @@ import PostController from "../../controllers/posts/PostController.js";
 
 import { authenticateAccessToken } from "../../middleware/auth/authenticateAccessToken.js";
 
-import { checkItem } from "../../middleware/validation/checkItem.js";
-import checkAuthor from "../../middleware/checkAuthor.js";
-import { validateTitle } from "../../middleware/validation/validateTitle.js";
-import { validateContent } from "../../middleware/validation/validateContent.js";
-import { validateCategories } from "../../middleware/validation/validateCategories.js";
-import { validateStatus } from "../../middleware/validation/validateStatus.js";
+import { checkItem } from "../../middleware/checkItem.js";
+import checkAuthor from "../../middleware/users/checkAuthor.js";
+import { validateTitle } from "../../middleware/posts/validateTitle.js";
+import { validateContent } from "../../middleware/posts/validateContent.js";
+import { validateCategories } from "../../middleware/posts/validateCategories.js";
+import { validateStatus } from "../../middleware/posts/validateStatus.js";
 
 router.get("/", PostController.getAllFiltered);
 router.get("/:post_id", PostController.getById);
 router.get("/:post_id/comments", PostController.getComments);
+router.get("/:post_id/categories", PostController.getCategories);
+router.get("/:post_id/like", PostController.getLikes)
 
 router.post("/", 
     authenticateAccessToken, 
