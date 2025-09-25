@@ -3,9 +3,12 @@ import http from "http";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
-import initDb from "./db/initDb.js";
 
 import router from "./routers/MainRouter.js";
+
+import initDb from "./db/initDb.js";
+import { initRatings } from "./services/initRatings.js";
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,6 +35,7 @@ app.use((req, res) => {
 const start = async () => {
   try {
     await initDb();
+    await initRatings();
 
     server.listen(8080, () => {
       console.log("Hello,Welcome to http://localhost:8080 happy zoo (instant show)");

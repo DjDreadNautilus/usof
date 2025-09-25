@@ -40,6 +40,8 @@ class BaseController {
             }
 
             await item.delete();
+            console.log(item);
+            recalculateUserRating(item.user_id);
             res.json({ status: "Success", message: "Deleted" });
         } catch (err) {
             res.status(500).json({ error: err.message });

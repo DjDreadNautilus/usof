@@ -10,15 +10,23 @@ class Post extends Model {
 
     static async filter(filters = {}) {
         let sql = `
-            SELECT p.*, SUM(DISTINCT CASE WHEN l.type = 'like' THEN 1 WHEN l.type = 'dislike' THEN -1 ELSE 0 END) AS rating
+            SELECT p.*, 
+                SUM(DISTINCT CASE WHEN l.type = 'like' THEN 1 WHEN l.type = 'dislike' THEN -1 ELSE 0 END) AS rating
             FROM posts p
-            LEFT JOIN post_categories pc ON p.id = pc.post_id
-            LEFT JOIN likes l ON l.post_id = p.id 
-            WHERE 1=1
         `;
 
         const values = [];
 
+        if (filters.favorites) {
+            sql += ` INNER JOIN user_favorites uf ON uf.post_id = p.id AND uf.user_id = ? `;
+            values.push(filters.favorites);
+        }
+
+        sql += `
+            LEFT JOIN post_categories pc ON p.id = pc.post_id
+            LEFT JOIN likes l ON l.post_id = p.id
+            WHERE 1=1
+        `;
         if (filters.category_ids?.length) {
             const placeholders = filters.category_ids.map(() => "?").join(", ");
             sql += ` AND pc.category_id IN (${placeholders})`;

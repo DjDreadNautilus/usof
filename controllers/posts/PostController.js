@@ -3,6 +3,7 @@ import PostCategories from "../../models/PostCategories.js";
 import Post from "../../models/Posts.js";
 import Likable from "../Likable.js";
 import Comment from "../../models/Comment.js";
+import UserFavorites from "../../models/UserFavorites.js";
 
 class PostController extends Likable {
     constructor() {
@@ -37,9 +38,7 @@ class PostController extends Likable {
     updatePost = async (req, res) => {
         try {
             const { post_id } = req.params;
-
             const post = req.item;
-
             const { categories, ...updates } = req.updates;
             
             post.update(updates);
@@ -105,6 +104,25 @@ class PostController extends Likable {
         }
     }
 
+    addFavorite = async (req, res) => {
+        try {
+            const post = req.item;
+            const user = req.user;
+
+            const existingFavorite = await UserFavorites.find({user_id: user.user_id, post_id: post.id});
+            if(existingFavorite) {
+                existingFavorite.delete();
+                return res.status(200).json({message: "deleted favorite"});
+            }
+            const favorite = new UserFavorites({user_id: user.user_id, post_id: post.id});
+            await favorite.save();
+
+            res.status(200).json({favorite, message: "Favorited the post!"})
+        } catch(err) {
+            res.status(500).json({error: err.message});
+        }
+    }
+
     async getComments(req, res) {
         try {
             const { post_id } = req.params;
@@ -121,10 +139,14 @@ class PostController extends Likable {
         try {
             const query = req.query;
             let status = "active";
+            let favorites = "";
+            
+            if(req.user && query.favorites) {
+                favorites = req.user.user_id;
+            }
             if(req.user && req.user.role === "admin") {
                 status = ""
             }
-
             let category_ids = [];
             if (query.category_ids) {
                 category_ids = query.category_ids.split(",").map(id => parseInt(id));
@@ -136,6 +158,7 @@ class PostController extends Likable {
 
             const filters = {
                 category_ids,
+                favorites: favorites,
                 status: status,
                 user_id: query.user_id ? parseInt(query.user_id) : undefined,
                 created_from: query.created_from,

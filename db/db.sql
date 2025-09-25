@@ -66,6 +66,13 @@ CREATE TABLE post_categories (
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
 );
 
+CREATE TABLE user_favorites (
+    user_id INT NOT NULL,
+    post_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
+);
+
 CREATE TABLE refresh_tokens (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -83,11 +90,11 @@ CREATE TABLE reset_tokens (
 );
 
 -- Users
-INSERT INTO users (login, fullname, password, email, role)
+INSERT INTO users (login, fullname, password, email, role, rating)
 VALUES
-  ('admin', 'Admin User', '$2b$10$v9bRqeGl.rWUJgC6t/2B7uGcKq4iQ2C1ohdu5u/t/uFDjpGU0ixR.', 'admin@example.com', 'admin'),
-  ('john', 'John Doe', 'hashed_password2', 'john@example.com', 'user'),
-  ('jane', 'Jane Smith', 'hashed_password3', 'jane@example.com', 'user');
+  ('admin', 'Admin User', '$2b$10$v9bRqeGl.rWUJgC6t/2B7uGcKq4iQ2C1ohdu5u/t/uFDjpGU0ixR.', 'admin@example.com', 'admin', 0),
+  ('john', 'John Doe', 'hashed_password2', 'john@example.com', 'user', 0),
+  ('jane', 'Jane Smith', 'hashed_password3', 'jane@example.com', 'user', 0);
 
 -- Categories
 INSERT INTO categories (title, description)

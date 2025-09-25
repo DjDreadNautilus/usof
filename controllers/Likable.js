@@ -1,6 +1,8 @@
 import BaseController from "./BaseController.js";
 import Like from "../models/Like.js";
 
+import { recalculateUserRating } from "../services/recalculateUserRating.js";
+
 class Likable extends BaseController {
     constructor(model, target) {
         super(model);
@@ -11,6 +13,7 @@ class Likable extends BaseController {
         try {
             const id = req.params[this.target];
             const user = req.user;
+            const item = req.item;
             const { type } = req.body;
 
             const lookup = await Like.find({ [this.target]: id, user_id: user.user_id });
@@ -30,7 +33,7 @@ class Likable extends BaseController {
             });
 
             await like.save();
-
+            await recalculateUserRating(item.user_id);
             res.status(200).json({ like, message: "Like created!" });
         } catch (err) {
             res.status(500).json({ error: err.message });
@@ -52,6 +55,7 @@ class Likable extends BaseController {
         try {
             const id = req.params[this.target];
             const user = req.user;
+            const item = req.item;
             const like = await Like.find({ [this.target]: id, user_id: user.user_id });
 
             if (!like) {
@@ -59,6 +63,7 @@ class Likable extends BaseController {
             }
 
             await like.delete();
+            recalculateUserRating(item.user_id);
 
             res.status(200).json({ message: "Like deleted" });
         } catch (err) {
