@@ -1,6 +1,8 @@
 import tokenService from "../../services/tokenService.js";
 import Hash from "../../services/Hash.js";
 import User from "../../models/User.js";
+import userController from "../users/userController.js";
+import { userService } from "../../services/userService.js";
 
 class AuthController {
     login = async (req, res) => {
@@ -31,11 +33,9 @@ class AuthController {
                 return res.status(400).json({message: "Passwords do not match"});
             }
 
-            const hashedPassword = await Hash.hash(password, 10);
-            const user = new User({ login, fullname, password: hashedPassword, email, role: "user", rating: 0 });
-            await user.save();
+            const user = await userService.createUser(login, fullname, password, email);
 
-            res.status(200).json({ message: "Registered!" });
+            res.status(200).json({user, message: "Registered!" });
         } catch (err) {
             console.error("Error during signup:", err);
             res.status(500).json({ error: "Internal Server Error!" });

@@ -2,6 +2,7 @@ import BaseController from "../BaseController.js";
 import Category from "../../models/Category.js";
 import PostCategories from "../../models/PostCategories.js";
 import Post from "../../models/Posts.js";
+import { categoryService } from "../../services/categoryService.js";
 
 class CategoryController extends BaseController {
     constructor() {
@@ -12,17 +13,11 @@ class CategoryController extends BaseController {
         try {
             const { title, description } = req.body;
 
-            const existingCategory = await Category.find({title: title});
-            if(existingCategory) {
-                return res.status(400).json({message: "Category exists!"});
+            const category = await categoryService.createCategory(title, description);
+            
+            if(!category) {
+                return res.status(400).json({ message: "Category already exists" });
             } 
-
-            const category = new Category({
-                title,
-                description: description || "nothing here yet"
-            });
-
-            await category.save();
 
             res.status(200).json({ category, message: "Successfully created a category!" });
         } catch (err) {
@@ -38,10 +33,9 @@ class CategoryController extends BaseController {
                 return res.status(404).json({ error: "Category not found" });
             }
 
-            const updates = req.updates;
-            await category.update(updates);
+            const updatedCatergory = await categoryService.updateCategory(category, req.updates);
 
-            res.json({ status: "Success!", message: "Category updated!" });
+            res.json({updatedCatergory, message: "Category updated!" });
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
@@ -51,12 +45,13 @@ class CategoryController extends BaseController {
         try {
             const { category_id } = req.params;
 
-            const relations = await PostCategories.getAll({ category_id: category_id });
-            const ids = relations.map(r => r.post_id);
+            const posts = await categoryService.getPostsByCategoryId(category_id);
 
-            const posts = await Post.getAll({ id: ids });
+            if(!posts) {
+                return res.status(404).json({erorr: "Posts not found"});
+            }
 
-            res.status(200).json({ posts, message: "Got posts from category!" });
+            res.status(200).json({posts, message: "Got posts from category!"});
         } catch (err) {
             res.status(500).json({ error: err.message });
         }

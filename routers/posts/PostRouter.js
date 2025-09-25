@@ -18,10 +18,22 @@ router.get("/", optionalAuth,
     PostController.getAllFiltered
 );
 
-router.get("/:post_id", PostController.getById);
-router.get("/:post_id/comments", PostController.getComments);
-router.get("/:post_id/categories", PostController.getCategories);
-router.get("/:post_id/like", PostController.getLikes)
+router.get("/:post_id", 
+    checkItem(Post, "post_id"),
+    PostController.getById
+);
+router.get("/:post_id/comments", 
+    checkItem(Post, "post_id"),
+    PostController.getComments
+);
+router.get("/:post_id/categories", 
+    checkItem(Post, "post_id"),
+    PostController.getCategories
+);
+router.get("/:post_id/like", 
+    checkItem(Post, "post_id"),
+    PostController.getLikes
+);
 
 router.post("/", 
     authenticateAccessToken, 

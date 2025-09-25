@@ -14,7 +14,10 @@ import { validateEmail } from "../../middleware/auth/validateEmail.js";
 import { validatePassword } from "../../middleware/auth/validatePassword.js";
 
 router.get("/", UserController.getAll);
-router.get("/:user_id", UserController.getById);
+router.get("/:user_id", 
+    checkItem(User, "user_id"),
+    UserController.getById
+);
 
 router.delete("/:user_id",
     authenticateAccessToken,

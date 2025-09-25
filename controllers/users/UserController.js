@@ -1,6 +1,7 @@
 import User from "../../models/User.js";
 import BaseController from "../BaseController.js";
 import Hash from "../../services/Hash.js";
+import { userService } from "../../services/userService.js";
 
 class UserController extends BaseController {
     constructor() {
@@ -12,19 +13,9 @@ class UserController extends BaseController {
             const { login, password, email, role } = req.updates;
             const {fullname} = req.body;
 
-            const hashedPassword = await Hash.hash(password, 10);
-            const user = new User({
-                login,
-                fullname,
-                password: hashedPassword,
-                email,
-                role: role ?? "user",
-                rating: 0
-            });
+            const user = await userService.createUser(login, fullname, password, email, role);
 
-            await user.save();
-
-            res.status(201).json({ status: "Success", message: "User created!", user });
+            res.status(201).json({ user, message: "User created!"});
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
@@ -39,15 +30,10 @@ class UserController extends BaseController {
             }
 
             const updates = req.updates;
-            console.log(updates)
 
-            if (updates.password) {
-                updates.password = await Hash.hash(updates.password, 10);
-            }
+            const updatedUser = await userService.updateUser(user, updates);
 
-            await user.update(updates);
-
-            res.status(200).json({ status: "Success", message: "User updated!" });
+            res.status(200).json({updatedUser, message: "User updated!" });
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
