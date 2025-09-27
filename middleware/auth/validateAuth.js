@@ -1,5 +1,5 @@
 import User from "../../models/User.js";
-import Hash from "../../services/Hash.js";
+import Hash from "../../utils/Hash.js";
 
 export async function validateAuth(req, res, next) {
     const { login, password, email } = req.body;

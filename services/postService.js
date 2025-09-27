@@ -1,6 +1,9 @@
 import pool from "../db/pool.js";
+
 import Post from "../models/Posts.js";
+
 import PostCategories from "../models/PostCategories.js";
+import UserFavorites from "../models/UserFavorites.js";
 
 export const postService = {
     createPost: async (user_id, title, content, categories) => {
@@ -46,7 +49,7 @@ export const postService = {
         const status = filters.status || "active";
         const values = [status];
 
-        const allowedOrderBy = ["rating", "created_at", "updated_at", "id"];
+        const allowedOrderBy = ["rating", "created_at"];
         if (!allowedOrderBy.includes(orderBy)) {
             orderBy = "rating";
         }
@@ -67,7 +70,7 @@ export const postService = {
         `;
 
         if (filters.favorites) {
-            sql += ` INNER JOIN user_favorites uf ON uf.post_id = p.id AND uf.user_id = ${Number(filters.favorites)}`;
+            sql += ` INNER JOIN user_favorites uf ON uf.post_id = p.id AND uf.user_id = ${filters.favorites}`;
         }
 
         sql += ` WHERE p.status = ?`;
@@ -96,5 +99,17 @@ export const postService = {
 
         const [rows] = await pool.execute(sql, values);
         return rows;
+    },
+    
+    addFavorite: async (post_id, user_id) => {
+            const existingFavorite = await UserFavorites.find({user_id, post_id});
+            if(existingFavorite) {
+                existingFavorite.delete();
+                return null;
+            }
+            const favorite = new UserFavorites({user_id, post_id});
+            await favorite.save();
+
+            return favorite;
     }
 };

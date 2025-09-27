@@ -7,7 +7,7 @@ import { fileURLToPath } from "url";
 import router from "./routers/MainRouter.js";
 
 import initDb from "./db/initDb.js";
-import { initRatings } from "./services/initRatings.js";
+import { initRatings } from "./utils/initRatings.js";
 
 
 const __filename = fileURLToPath(import.meta.url);

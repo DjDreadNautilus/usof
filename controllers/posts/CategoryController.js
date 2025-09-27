@@ -1,7 +1,6 @@
 import BaseController from "../BaseController.js";
 import Category from "../../models/Category.js";
-import PostCategories from "../../models/PostCategories.js";
-import Post from "../../models/Posts.js";
+
 import { categoryService } from "../../services/categoryService.js";
 
 class CategoryController extends BaseController {

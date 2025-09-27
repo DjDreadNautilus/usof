@@ -1,6 +1,5 @@
 import User from "../../models/User.js";
 import BaseController from "../BaseController.js";
-import Hash from "../../services/Hash.js";
 import { userService } from "../../services/userService.js";
 
 class UserController extends BaseController {
@@ -13,7 +12,7 @@ class UserController extends BaseController {
             const { login, password, email, role } = req.updates;
             const {fullname} = req.body;
 
-            const user = await userService.createUser(login, fullname, password, email, role);
+            const user = await userService.createUser(login, fullname, password, email, true, role);
 
             res.status(201).json({ user, message: "User created!"});
         } catch (err) {

@@ -86,6 +86,4 @@ router.delete("/categories/:category_id",
     CategoryController.delete
 );
 
-//likes
-
 export default router;

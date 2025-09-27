@@ -1,14 +1,15 @@
 import User from "../models/User.js";
-import Hash from "./Hash.js";
+import Hash from "../utils/Hash.js";
 
 export const userService = {
-    createUser: async (login, fullname, password, email, role = "user") => {
+    createUser: async (login, fullname, password, email, verified = false, role = "user") => {
         const hashedPassword = await Hash.hash(password, 10);
         const user = new User({
             login,
             fullname,
             password: hashedPassword,
             email,
+            verified,
             role: role,
             rating: 0
         });

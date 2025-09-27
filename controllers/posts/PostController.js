@@ -1,9 +1,6 @@
-import Category from "../../models/Category.js";
-import PostCategories from "../../models/PostCategories.js";
 import Post from "../../models/Posts.js";
 import Likable from "../Likable.js";
-import Comment from "../../models/Comment.js";
-import UserFavorites from "../../models/UserFavorites.js";
+
 import { postService } from "../../services/postService.js";
 import { commentService } from "../../services/commentService.js";
 import { categoryService } from "../../services/categoryService.js";
@@ -71,19 +68,17 @@ class PostController extends Likable {
             res.status(500).json({ error: err.message });
         }
     }
-//sdelay metod v servise
+    
     addFavorite = async (req, res) => {
         try {
             const post = req.item;
             const user = req.user;
 
-            const existingFavorite = await UserFavorites.find({user_id: user.user_id, post_id: post.id});
-            if(existingFavorite) {
-                existingFavorite.delete();
-                return res.status(200).json({message: "deleted favorite"});
+            const favorite = await postService.addFavorite(post.id, user.user_id);
+
+            if(!favorite) {
+                res.status(200).json({message: "Deleted favorite"});
             }
-            const favorite = new UserFavorites({user_id: user.user_id, post_id: post.id});
-            await favorite.save();
 
             res.status(200).json({favorite, message: "Favorited the post!"})
         } catch(err) {

@@ -1,4 +1,4 @@
-import Validator from "../../services/Validator.js";
+import Validator from "../../utils/Validator.js";
 
 export function validateContent(req, res, next) {
     try {

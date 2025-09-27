@@ -11,6 +11,7 @@ CREATE TABLE users (
     fullname VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
     email varchar(255) NOT NULL UNIQUE,
+    verified BOOLEAN NOT NULL DEFAULT FALSE,
     role VARCHAR(100),
     rating INT,
     avatar varchar(255) NOT NULL DEFAULT "/storage/avatars/default.png",
@@ -90,11 +91,11 @@ CREATE TABLE reset_tokens (
 );
 
 -- Users
-INSERT INTO users (login, fullname, password, email, role, rating)
+INSERT INTO users (login, fullname, password, email, verified, role, rating)
 VALUES
-  ('admin', 'Admin User', '$2b$10$v9bRqeGl.rWUJgC6t/2B7uGcKq4iQ2C1ohdu5u/t/uFDjpGU0ixR.', 'admin@example.com', 'admin', 0),
-  ('john', 'John Doe', 'hashed_password2', 'john@example.com', 'user', 0),
-  ('jane', 'Jane Smith', 'hashed_password3', 'jane@example.com', 'user', 0);
+  ('admin', 'Admin User', '$2b$10$v9bRqeGl.rWUJgC6t/2B7uGcKq4iQ2C1ohdu5u/t/uFDjpGU0ixR.', 'admin@example.com', 1, 'admin', 0), -- password: asdasd123
+  ('john', 'John Doe', '$2b$10$v9bRqeGl.rWUJgC6t/2B7uGcKq4iQ2C1ohdu5u/t/uFDjpGU0ixR', 'john@example.com', 1, 'user', 0),
+  ('jane', 'Jane Smith', '$2b$10$v9bRqeGl.rWUJgC6t/2B7uGcKq4iQ2C1ohdu5u/t/uFDjpGU0ixR', 'jane@example.com', 1, 'user', 0);
 
 -- Categories
 INSERT INTO categories (title, description)

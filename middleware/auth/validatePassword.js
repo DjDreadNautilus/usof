@@ -1,4 +1,4 @@
-import Validator from "../../services/Validator.js";
+import Validator from "../../utils/Validator.js";
 
 export async function validatePassword(req, res, next) {
     try {

@@ -1,6 +1,6 @@
 import BaseController from "./BaseController.js";
 
-import { recalculateUserRating } from "../services/recalculateUserRating.js";
+import { recalculateUserRating } from "../utils/recalculateUserRating.js";
 import { likeService } from "../services/likeService.js";
 
 class Likable extends BaseController {

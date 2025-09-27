@@ -1,4 +1,4 @@
-import Validator from "../../services/Validator.js";
+import Validator from "../../utils/Validator.js";
 import User from "../../models/User.js";
 
 export async function validateLogin(req, res, next) {
