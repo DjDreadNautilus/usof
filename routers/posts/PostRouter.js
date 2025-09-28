@@ -13,6 +13,7 @@ import { validateTitle } from "../../middleware/posts/validateTitle.js";
 import { validateContent } from "../../middleware/posts/validateContent.js";
 import { validateCategories } from "../../middleware/posts/validateCategories.js";
 import { validateStatus } from "../../middleware/posts/validateStatus.js";
+import { checkPostAvailability } from "../../middleware/posts/checkPostAvailability.js";
 
 router.get("/", optionalAuth, 
     PostController.getAllFiltered
@@ -55,6 +56,7 @@ router.post("/:post_id/favorite",
 router.post("/:post_id/comments", 
     authenticateAccessToken, 
     checkItem(Post, "post_id"),
+    checkPostAvailability,
     validateContent, 
     PostController.createComment
 );
@@ -62,6 +64,7 @@ router.post("/:post_id/comments",
 router.post("/:post_id/like",
     authenticateAccessToken,
     checkItem(Post, "post_id"),
+    checkPostAvailability,
     PostController.createLike
 );
 

@@ -3,8 +3,7 @@ export const checkItem = (model, param) => {
         try {
 
             let id = req.params[param];
-
-            if(req.user) {
+            if(model.table_name === "users" && !id) {
                 id = req.user.user_id;
             }
 

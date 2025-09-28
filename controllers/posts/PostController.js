@@ -50,16 +50,9 @@ class PostController extends Likable {
     createComment = async (req, res) => {
         try {
             const post = req.item;
-            if(post.status === "inactive") {
-                return res.status(400).json({message: "Post is not available"});
-            }
             
             const user = req.user;
             const { content } = req.updates;
-
-            if (!content) {
-                return res.status(400).json({ error: "Empty comment" });
-            }
 
             const comment = await commentService.createComment(user.user_id, post.id, content);
 
