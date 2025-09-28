@@ -46,11 +46,7 @@ router.delete("/users/:user_id",
     UserController.delete
 );
 
-//posts 
-router.get("/posts", PostController.getAllFiltered);
-router.get("/posts/:post_id/categories", PostController.getCategories)
-router.get("/posts/:post_id/like", PostController.getLikes);
-
+//posts
 router.patch("/posts/:post_id", 
     checkItem(Post, "post_id"),
     validateCategories,
