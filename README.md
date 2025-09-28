@@ -31,17 +31,17 @@ This API is the backend foundation for the future USOF web application. It provi
   </li>
   <li>Create a <code>.env</code> file in the project root and configure your environment variables:
     <pre><code>
-      ACCESS_TOKEN_SECRET= Your secred here
-      REFRESH_TOKEN_SECRET= Your secred here
-      DB_HOST= Your host (localhost)
-      DB_USER= Some username
-      DB_PASSWORD= Some password
-      DB_NAME= DB name
-      ROOT_PASSWORD= Your root password
-      ROOT_USER= Your root username
-      SMTP_HOST= smtp host
-      SMTP_USER= smtp user
-      SMTP_PASS= smtp pass
+  ACCESS_TOKEN_SECRET= Your secred here
+  REFRESH_TOKEN_SECRET= Your secred here
+  DB_HOST= Your host (localhost)
+  DB_USER= Some username
+  DB_PASSWORD= Some password
+  DB_NAME= DB name
+  ROOT_PASSWORD= Your root password
+  ROOT_USER= Your root username
+  SMTP_HOST= smtp host
+  SMTP_USER= smtp user
+  SMTP_PASS= smtp pass
     </code></pre>
   </li>
   <li>Start the server:
