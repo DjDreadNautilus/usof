@@ -6,7 +6,7 @@ node_modules/
 
 # storage
 storage/avatars/*
-storage/posts/*
-
 !storage/avatars/.gitkeep
+
+storage/posts/*
 !storage/posts/.gitkeep
