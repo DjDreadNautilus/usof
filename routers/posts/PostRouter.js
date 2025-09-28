@@ -14,6 +14,7 @@ import { validateContent } from "../../middleware/posts/validateContent.js";
 import { validateCategories } from "../../middleware/posts/validateCategories.js";
 import { validateStatus } from "../../middleware/posts/validateStatus.js";
 import { checkPostAvailability } from "../../middleware/posts/checkPostAvailability.js";
+import uploadPostImages from "../../middleware/posts/postImageUpload.js";
 
 router.get("/", optionalAuth, 
     PostController.getAllFiltered
@@ -40,7 +41,8 @@ router.get("/:post_id/like",
 );
 
 router.post("/", 
-    authenticateAccessToken, 
+    authenticateAccessToken,
+    uploadPostImages,
     validateTitle,
     validateContent,
     validateCategories, 
@@ -78,6 +80,7 @@ router.patch("/:post_id",
     authenticateAccessToken,
     checkItem(Post, "post_id"),
     checkAuthor(Post),
+    uploadPostImages,
     validateTitle,
     validateContent,
     validateCategories,

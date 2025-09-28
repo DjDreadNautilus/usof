@@ -5,4 +5,8 @@ node_modules/
 .env
 
 # storage
-storage/
+storage/avatars/*
+storage/posts/*
+
+!storage/avatars/.gitkeep
+!storage/posts/.gitkeep

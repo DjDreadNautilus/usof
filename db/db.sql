@@ -26,6 +26,7 @@ CREATE TABLE posts (
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     user_id INT NOT NULL,
+    images JSON,
     status VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE

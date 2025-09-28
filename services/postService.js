@@ -7,14 +7,15 @@ import UserFavorites from "../models/UserFavorites.js";
 import UserSubscribes from "../models/UserSubscribes.js";
 
 export const postService = {
-    createPost: async (user_id, title, content, categories) => {
+    createPost: async (user_id, title, content, categories, images) => {
         console.log({ user_id, title, content });
 
         const post = new Post({
             user_id,
             title,
             content,
-            status: "active"
+            status: "active",
+            images
         });
         await post.save();
 

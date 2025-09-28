@@ -13,7 +13,7 @@ export const subscriptionService = {
     },
 
     notifySubscribers: async (post_id, type, payload = {}) => {
-        const subs = subscriptionService.getAllSubscribersForPost(post_id);
+        const subs = await subscriptionService.getAllSubscribersForPost(post_id);
 
         for(const sub of subs) {
             await subscriptionService.createNotification(sub.user_id, post_id, type, payload);
