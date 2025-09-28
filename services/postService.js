@@ -46,61 +46,68 @@ export const postService = {
         return post;
     },
 
-    getAllFiltered: async ({page = 1, limit = 5, orderBy = "rating", order = "DESC", filters = {}} = {}) => {
+    getAllFiltered: async ({ page = 1, limit = 5, orderBy = "rating", order = "DESC", filters = {} } = {}) => {
         const offset = (page - 1) * limit;
         const status = filters.status;
         const values = [status];
 
         const allowedOrderBy = ["rating", "created_at"];
-        if (!allowedOrderBy.includes(orderBy)) {
-            orderBy = "rating";
-        }
+        if (!allowedOrderBy.includes(orderBy)) orderBy = "rating";
 
         const allowedOrder = ["ASC", "DESC"];
-        if (!allowedOrder.includes(order.toUpperCase())) {
-            order = "DESC";
-        }
+        if (!allowedOrder.includes(order.toUpperCase())) order = "DESC";
 
-        let sql = `
-            SELECT p.*, 
-                COALESCE(SUM(CASE WHEN l.type='like' THEN 1 
-                                    WHEN l.type='dislike' THEN -1 
-                                    ELSE 0 END), 0) AS rating
+        // Base FROM + JOIN clause for reusability
+        let baseFrom = `
             FROM posts p
             LEFT JOIN likes l ON l.post_id = p.id
             LEFT JOIN post_categories pc ON pc.post_id = p.id
         `;
 
         if (filters.favorites) {
-            sql += ` INNER JOIN user_favorites uf ON uf.post_id = p.id AND uf.user_id = ${filters.favorites}`;
+            baseFrom += ` INNER JOIN user_favorites uf ON uf.post_id = p.id AND uf.user_id = ${filters.favorites}`;
         }
 
-        sql += ` WHERE p.status = ?`;
-
+        // WHERE clause
+        let whereClause = ` WHERE p.status = ?`;
         if (filters.category_ids?.length > 0) {
             const placeholders = filters.category_ids.map(() => "?").join(",");
-            sql += ` AND pc.category_id IN (${placeholders})`;
+            whereClause += ` AND pc.category_id IN (${placeholders})`;
             values.push(...filters.category_ids);
         }
-
         if (filters.created_from) {
-            sql += ` AND p.created_at >= ?`;
+            whereClause += ` AND p.created_at >= ?`;
             values.push(filters.created_from);
         }
-
         if (filters.created_to) {
-            sql += ` AND p.created_at <= ?`;
+            whereClause += ` AND p.created_at <= ?`;
             values.push(filters.created_to);
         }
 
-        sql += ` GROUP BY p.id`;
+        // 1️⃣ Get total count
+        const countSql = `
+            SELECT COUNT(DISTINCT p.id) AS total
+            ${baseFrom}
+            ${whereClause}
+        `;
+        const [countResult] = await pool.execute(countSql, values);
+        const total = countResult[0].total;
 
-        sql += ` ORDER BY ${orderBy} ${order}`;
+        // 2️⃣ Get paginated posts
+        const dataSql = `
+            SELECT p.*, 
+                COALESCE(SUM(CASE WHEN l.type='like' THEN 1 
+                                WHEN l.type='dislike' THEN -1 
+                                ELSE 0 END), 0) AS rating
+            ${baseFrom}
+            ${whereClause}
+            GROUP BY p.id
+            ORDER BY ${orderBy} ${order}
+            LIMIT ${limit} OFFSET ${offset}
+        `;
+        const [rows] = await pool.execute(dataSql, values);
 
-        sql += ` LIMIT ${limit} OFFSET ${offset}`;
-
-        const [rows] = await pool.execute(sql, values);
-        return rows;
+        return { rows, total };
     },
     
     addFavorite: async (post_id, user_id) => {

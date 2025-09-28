@@ -1,3 +1,5 @@
+import { recalculateUserRating } from "../utils/recalculateUserRating.js";
+
 class BaseController {
     constructor(model) {
         this.model = model;
@@ -38,10 +40,9 @@ class BaseController {
             if (!item) {
                 return res.status(404).json({ error: "Not found" });
             }
-
             await item.delete();
             console.log(item);
-            recalculateUserRating(item.user_id);
+            await recalculateUserRating(item.user_id);
             res.json({ status: "Success", message: "Deleted" });
         } catch (err) {
             res.status(500).json({ error: err.message });

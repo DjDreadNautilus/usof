@@ -139,12 +139,25 @@ class PostController extends Likable {
             Object.keys(filters).forEach(key => filters[key] === undefined && delete filters[key]);
             console.log(filters);
 
-            const posts = await postService.getAllFiltered({
-                page: page,
-                limit: limit,
-                filters: filters,
+            const { rows, total } = await postService.getAllFiltered({
+                page,
+                limit,
+                filters,
             });
-            res.json(posts);
+
+            const totalPages = Math.ceil(total / limit);
+
+            res.json({
+                pagination: {
+                    totalItems: total,
+                    totalPages: totalPages,
+                    currentPage: page,
+                    limit: limit,
+                    hasNextPage: page < totalPages,
+                    hasPrevPage: page > 1
+                },
+                data: rows
+            });
         } catch (err) {
             res.status(500).json({ error: err.message });
         }

@@ -1,8 +1,6 @@
 import Hash from "../../utils/Hash.js";
 import User from "../../models/User.js";
-import ResetToken from "../../models/ResetToken.js";
 import { mailService } from "../../services/mailService.js";
-import { userService } from "../../services/userService.js";
 import tokenService from "../../services/tokenService.js";
 
 class resetPasswordController {
