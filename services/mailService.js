@@ -1,20 +1,21 @@
 import nodemailer from "nodemailer";
+import "dotenv/config.js";
 
 export const mailService = {
 
     sendMail: async (email, subject, text, html) => {
         const transporter = nodemailer.createTransport({
-            host: "smtp.mailersend.net",
+            host: process.env.SMTP_HOST,
             port: 587,
             secure: false, 
             auth: {
-                user: "MS_jV2Bbi@test-2p0347zknqplzdrn.mlsender.net",
-                pass: "mssp.cG5ypz8.pr9084zpr08gw63d.PIZvLbv",
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASS,
             },
         });
 
         await transporter.sendMail({
-            from: '"App support" <MS_jV2Bbi@test-2p0347zknqplzdrn.mlsender.net>', 
+            from: `"App support" <${process.env.SMTP_USER}>`, 
             to: email, 
             subject: subject,
             text: text,
