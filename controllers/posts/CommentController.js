@@ -1,4 +1,5 @@
 import Comment from "../../models/Comment.js";
+import { commentService } from "../../services/commentService.js";
 import Likable from "../Likable.js";
 
 class CommentController extends Likable {
@@ -11,9 +12,9 @@ class CommentController extends Likable {
             const updates = req.updates;
             const item = req.item;
 
-            await item.update(updates);
+            const updatedComment = await commentService.updateComment(item, updates);
 
-            res.json({ status: "Success!", message: "Comment updated!" });
+            res.status(200).json({updatedComment, message: "Comment updated!" });
         } catch (err) {
             res.status(500).json({ error: err.message });
         }

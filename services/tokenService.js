@@ -1,7 +1,9 @@
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import "dotenv/config.js";
 import RefreshToken from "../models/RefreshToken.js";
-import Hash from "../services/Hash.js";
+import ResetToken from "../models/ResetToken.js";
+import Hash from "../utils/Hash.js";
 
 async function createRefreshToken(user) {
     const payload = {
@@ -44,4 +46,15 @@ async function findTokensByUserID(userId) {
     return await RefreshToken.getAll({ user_id: userId });
 }
 
-export default {verifyToken, createAccessToken, findTokensByUserID, createRefreshToken}
+async function createResetToken(email) {
+    const token = new ResetToken({
+        token: crypto.randomBytes(64).toString("hex"),
+        user_email: email,
+        expiration_date: new Date(Date.now() + 15 * 60 * 1000)
+    });
+    
+    await token.save();
+    return token;
+}
+
+export default {verifyToken, createAccessToken, findTokensByUserID, createRefreshToken, createResetToken}

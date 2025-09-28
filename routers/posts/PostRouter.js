@@ -5,6 +5,7 @@ import Post from "../../models/Posts.js";
 import PostController from "../../controllers/posts/PostController.js";
 
 import { authenticateAccessToken } from "../../middleware/auth/authenticateAccessToken.js";
+import { optionalAuth } from "../../middleware/auth/optionalAuth.js";
 
 import { checkItem } from "../../middleware/checkItem.js";
 import checkAuthor from "../../middleware/users/checkAuthor.js";
@@ -12,24 +13,52 @@ import { validateTitle } from "../../middleware/posts/validateTitle.js";
 import { validateContent } from "../../middleware/posts/validateContent.js";
 import { validateCategories } from "../../middleware/posts/validateCategories.js";
 import { validateStatus } from "../../middleware/posts/validateStatus.js";
+import { checkPostAvailability } from "../../middleware/posts/checkPostAvailability.js";
+import uploadPostImages from "../../middleware/posts/postImageUpload.js";
 
-router.get("/", PostController.getAllFiltered);
-router.get("/:post_id", PostController.getById);
-router.get("/:post_id/comments", PostController.getComments);
-router.get("/:post_id/categories", PostController.getCategories);
-router.get("/:post_id/like", PostController.getLikes)
+router.get("/", optionalAuth, 
+    PostController.getAllFiltered
+);
+router.get("/favorites",
+    authenticateAccessToken,
+    PostController.getAllFavorites
+);
+router.get("/:post_id", 
+    checkItem(Post, "post_id"),
+    PostController.getById
+);
+router.get("/:post_id/comments", 
+    checkItem(Post, "post_id"),
+    PostController.getComments
+);
+router.get("/:post_id/categories", 
+    checkItem(Post, "post_id"),
+    PostController.getCategories
+);
+router.get("/:post_id/like", 
+    checkItem(Post, "post_id"),
+    PostController.getLikes
+);
 
 router.post("/", 
-    authenticateAccessToken, 
+    authenticateAccessToken,
+    uploadPostImages,
     validateTitle,
     validateContent,
     validateCategories, 
     PostController.createPost
 );
 
+router.post("/:post_id/favorite",
+    authenticateAccessToken,
+    checkItem(Post, "post_id"),
+    PostController.addFavorite
+);
+
 router.post("/:post_id/comments", 
     authenticateAccessToken, 
     checkItem(Post, "post_id"),
+    checkPostAvailability,
     validateContent, 
     PostController.createComment
 );
@@ -37,17 +66,32 @@ router.post("/:post_id/comments",
 router.post("/:post_id/like",
     authenticateAccessToken,
     checkItem(Post, "post_id"),
-    PostController.createLike);
+    checkPostAvailability,
+    PostController.createLike
+);
+
+router.post("/:post_id/subscribe",
+    authenticateAccessToken,
+    checkItem(Post, "post_id"),
+    PostController.subscribeToPost
+);
 
 router.patch("/:post_id",
     authenticateAccessToken,
     checkItem(Post, "post_id"),
     checkAuthor(Post),
+    uploadPostImages,
     validateTitle,
     validateContent,
     validateCategories,
     validateStatus,
     PostController.updatePost
+);
+
+router.post("/:post_id",
+    authenticateAccessToken,
+    checkItem(Post, "post_id"),
+    PostController.addFavorite
 );
 
 router.delete("/:post_id/like",

@@ -2,15 +2,13 @@ DROP DATABASE IF EXISTS usof;
 CREATE DATABASE IF NOT EXISTS usof;
 USE usof;
 
-CREATE USER IF NOT EXISTS 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
-GRANT ALL PRIVILEGES ON usof.* TO 'root'@'localhost';
-
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     login VARCHAR(255) NOT NULL,
     fullname VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
     email varchar(255) NOT NULL UNIQUE,
+    verified BOOLEAN NOT NULL DEFAULT FALSE,
     role VARCHAR(100),
     rating INT,
     avatar varchar(255) NOT NULL DEFAULT "/storage/avatars/default.png",
@@ -28,6 +26,7 @@ CREATE TABLE posts (
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     user_id INT NOT NULL,
+    images JSON,
     status VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -59,11 +58,34 @@ CREATE TABLE likes (
     )
 );
 
+CREATE TABLE notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    post_id INT NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    payload JSON,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE post_categories (
     post_id INT NOT NULL,
     category_id INT NOT NULL,
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+);
+
+CREATE TABLE user_favorites (
+    user_id INT NOT NULL,
+    post_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
+);
+
+CREATE TABLE user_subscribes (
+    user_id INT NOT NULL,
+    post_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
 );
 
 CREATE TABLE refresh_tokens (
@@ -83,11 +105,11 @@ CREATE TABLE reset_tokens (
 );
 
 -- Users
-INSERT INTO users (login, fullname, password, email, role)
+INSERT INTO users (login, fullname, password, email, verified, role, rating)
 VALUES
-  ('admin', 'Admin User', '$2b$10$v9bRqeGl.rWUJgC6t/2B7uGcKq4iQ2C1ohdu5u/t/uFDjpGU0ixR.', 'admin@example.com', 'admin'),
-  ('john', 'John Doe', 'hashed_password2', 'john@example.com', 'user'),
-  ('jane', 'Jane Smith', 'hashed_password3', 'jane@example.com', 'user');
+  ('admin', 'Admin User', '$2b$10$v9bRqeGl.rWUJgC6t/2B7uGcKq4iQ2C1ohdu5u/t/uFDjpGU0ixR.', 'admin@example.com', 1, 'admin', 0), -- password: asdasd123
+  ('john', 'John Doe', '$2b$10$v9bRqeGl.rWUJgC6t/2B7uGcKq4iQ2C1ohdu5u/t/uFDjpGU0ixR', 'john@example.com', 1, 'user', 0),
+  ('jane', 'Jane Smith', '$2b$10$v9bRqeGl.rWUJgC6t/2B7uGcKq4iQ2C1ohdu5u/t/uFDjpGU0ixR', 'jane@example.com', 1, 'user', 0);
 
 -- Categories
 INSERT INTO categories (title, description)

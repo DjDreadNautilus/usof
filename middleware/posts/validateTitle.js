@@ -1,4 +1,4 @@
-import Validator from "../../services/Validator.js";
+import Validator from "../../utils/Validator.js";
 
 export const validateTitle = async (req, res, next) => {
     try {

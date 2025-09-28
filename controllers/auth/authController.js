@@ -1,11 +1,18 @@
 import tokenService from "../../services/tokenService.js";
-import Hash from "../../services/Hash.js";
-import User from "../../models/User.js";
+import Hash from "../../utils/Hash.js";
+import { userService } from "../../services/userService.js";
+import { mailService } from "../../services/mailService.js";
 
 class AuthController {
     login = async (req, res) => {
         try {
-            const refreshToken = await tokenService.createRefreshToken({ user_id: req.user.id, role: req.user.role });
+            const user = req.user;
+
+            if(!user.verified) {
+                return res.status(400).json({message: "Unverified email, try again!"});
+            }
+
+            const refreshToken = await tokenService.createRefreshToken({ user_id: user.id, role: user.role });
             const accessToken = tokenService.createAccessToken(req.user);
 
             res.cookie("refreshToken", refreshToken, {
@@ -17,8 +24,7 @@ class AuthController {
 
             res.status(200).json({ message: "Logged in!", accessToken });
         } catch (err) {
-            console.error("Error during login:", err);
-            res.status(500).json({ error: "Internal Server Error!" });
+            res.status(500).json({ error: err.message });
         }
     }
 
@@ -31,14 +37,20 @@ class AuthController {
                 return res.status(400).json({message: "Passwords do not match"});
             }
 
-            const hashedPassword = await Hash.hash(password, 10);
-            const user = new User({ login, fullname, password: hashedPassword, email, role: "user", rating: 0 });
-            await user.save();
+            const user = await userService.createUser(login, fullname, password, email, false);
+            
+            const token = await tokenService.createResetToken(email);
 
-            res.status(200).json({ message: "Registered!" });
+            const link = `http://localhost:8080/api/auth/email-confirm/${token.token}`
+            const subject = "Email conformation";
+            const text = `Confirm email: ${link}`;
+            const html = `<b>Confirmation link: ${link}</b>`
+
+            await mailService.sendMail(email, subject, text, html);
+
+            res.status(200).json({user, message: "Registered! Check your mailbox to confirm email!" });
         } catch (err) {
-            console.error("Error during signup:", err);
-            res.status(500).json({ error: "Internal Server Error!" });
+            res.status(500).json({ error: err.message });
         }
     }
 
@@ -72,8 +84,19 @@ class AuthController {
 
             res.status(200).json({ message: "You were logged out" });
         } catch (err) {
-            console.error("Error during logout:", err);
-            res.status(500).json({ error: "Internal Server Error!" });
+            res.status(500).json({ error: err.message });
+        }
+    }
+
+    confirmEmail = async (req, res) => {
+        try {
+            const user = req.user;
+
+            await userService.updateUser(user, {verified: true});
+
+            res.status(200).json({ message: "User verified!" });
+        } catch(err) {
+            res.status(500).json({ error: err.message });
         }
     }
 }
