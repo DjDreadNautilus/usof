@@ -104,16 +104,14 @@ CREATE TABLE reset_tokens (
     FOREIGN KEY (user_email) REFERENCES users(email) ON DELETE CASCADE
 );
 
--- Users (5 users, including admin)
 INSERT INTO users (login, fullname, password, email, verified, role, rating)
 VALUES
   ('admin', 'Admin User', '$2b$10$v9bRqeGl.rWUJgC6t/2B7uGcKq4iQ2C1ohdu5u/t/uFDjpGU0ixR.', 'admin@example.com', 1, 'admin', 0), -- password: asdasd123
-  ('john', 'John Doe', '$2b$10$v9bRqeGl.rWUJgC6t/2B7uGcKq4iQ2C1ohdu5u/t/uFDjpGU0ixR.', 'john@example.com', 1, 'user', 0),
-  ('jane', 'Jane Smith', '$2b$10$v9bRqeGl.rWUJgC6t/2B7uGcKq4iQ2C1ohdu5u/t/uFDjpGU0ixR.', 'jane@example.com', 1, 'user', 0),
+  ('andrey', 'Andrey Gobzavr', '$2b$10$v9bRqeGl.rWUJgC6t/2B7uGcKq4iQ2C1ohdu5u/t/uFDjpGU0ixR.', 'andrey@example.com', 1, 'user', 0),
+  ('oper', 'Oper Upolnomocheniy', '$2b$10$v9bRqeGl.rWUJgC6t/2B7uGcKq4iQ2C1ohdu5u/t/uFDjpGU0ixR.', 'oper@example.com', 1, 'user', 0),
   ('mark', 'Mark Taylor', '$2b$10$v9bRqeGl.rWUJgC6t/2B7uGcKq4iQ2C1ohdu5u/t/uFDjpGU0ixR.', 'mark@example.com', 1, 'user', 0),
   ('lisa', 'Lisa Wong', '$2b$10$v9bRqeGl.rWUJgC6t/2B7uGcKq4iQ2C1ohdu5u/t/uFDjpGU0ixR.', 'lisa@example.com', 1, 'user', 0);
 
--- Categories (5 categories)
 INSERT INTO categories (title, description)
 VALUES
   ('Technology', 'All about tech'),
@@ -122,7 +120,6 @@ VALUES
   ('Programming', 'Code tips and debugging help'),
   ('Career', 'Discussions about tech jobs and growth');
 
--- Posts (5 posts)
 INSERT INTO posts (title, content, user_id, status)
 VALUES
   ('First Post', 'This is the first test post.', 1, 'active'),
@@ -131,7 +128,6 @@ VALUES
   ('Node.js Tips', 'Here are some useful Node.js tips for beginners.', 4, 'active'),
   ('Career Advice', 'How do you negotiate your first developer job offer?', 5, 'active');
 
--- Comments (at least 5 comments)
 INSERT INTO comments (user_id, post_id, content)
 VALUES
   (2, 1, 'Nice post!'),
@@ -140,7 +136,6 @@ VALUES
   (5, 4, 'Great tips, thanks for posting.'),
   (4, 5, 'Negotiation is key, do your research first.');
 
--- Likes (at least 5 likes)
 INSERT INTO likes (post_id, user_id, type)
 VALUES
   (1, 2, 'like'),
@@ -149,7 +144,6 @@ VALUES
   (4, 5, 'like'),
   (5, 4, 'like');
 
--- Post-Categories (link posts to categories)
 INSERT INTO post_categories (post_id, category_id)
 VALUES
   (1, 1),
