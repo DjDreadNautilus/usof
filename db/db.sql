@@ -57,6 +57,15 @@ CREATE TABLE likes (
     )
 );
 
+CREATE TABLE notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    post_id INT NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    payload JSON,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE post_categories (
     post_id INT NOT NULL,
     category_id INT NOT NULL,
@@ -65,6 +74,13 @@ CREATE TABLE post_categories (
 );
 
 CREATE TABLE user_favorites (
+    user_id INT NOT NULL,
+    post_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
+);
+
+CREATE TABLE user_subscribes (
     user_id INT NOT NULL,
     post_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,

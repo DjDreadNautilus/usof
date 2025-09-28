@@ -5,7 +5,7 @@ import User from "../../models/User.js";
 import UserController from "../../controllers/users/UserController.js";
 
 import { authenticateAccessToken } from "../../middleware/auth/authenticateAccessToken.js";
-import fileUpload from "../../middleware/fileUpload.js";
+import avatarUpload from "../../middleware/avatarUpload.js";
 
 import checkAuthor from "../../middleware/users/checkAuthor.js";
 import { checkItem } from "../../middleware/checkItem.js";
@@ -30,7 +30,7 @@ router.patch("/avatar",
     authenticateAccessToken,
     checkItem(User, "user_id"),
     checkAuthor(User),
-    fileUpload,
+    avatarUpload,
     UserController.updateAvatar
 );
 

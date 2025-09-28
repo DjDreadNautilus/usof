@@ -68,6 +68,12 @@ router.post("/:post_id/like",
     PostController.createLike
 );
 
+router.post("/:post_id/subscribe",
+    authenticateAccessToken,
+    checkItem(Post, "post_id"),
+    PostController.subscribeToPost
+);
+
 router.patch("/:post_id",
     authenticateAccessToken,
     checkItem(Post, "post_id"),

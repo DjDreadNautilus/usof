@@ -4,6 +4,7 @@ import Post from "../models/Posts.js";
 
 import PostCategories from "../models/PostCategories.js";
 import UserFavorites from "../models/UserFavorites.js";
+import UserSubscribes from "../models/UserSubscribes.js";
 
 export const postService = {
     createPost: async (user_id, title, content, categories) => {
@@ -119,5 +120,18 @@ export const postService = {
             return null;
         }
         return favorites;
-    }
+    },
+
+    subscribeToPost: async (user_id, post_id) => {
+        const existingSubscription = await UserSubscribes.find({user_id, post_id});
+        if(existingSubscription) {
+            existingSubscription.delete();
+            return null;
+        }
+        const subscription = new UserSubscribes({user_id, post_id});
+
+        await subscription.save()
+
+        return subscription;
+    },
 };
