@@ -46,7 +46,7 @@ export const postService = {
 
     getAllFiltered: async ({page = 1, limit = 5, orderBy = "rating", order = "DESC", filters = {}} = {}) => {
         const offset = (page - 1) * limit;
-        const status = filters.status || "active";
+        const status = filters.status;
         const values = [status];
 
         const allowedOrderBy = ["rating", "created_at"];
@@ -111,5 +111,13 @@ export const postService = {
             await favorite.save();
 
             return favorite;
+    }, 
+
+    getAllFavorite: async (user_id) => {
+        const favorites = UserFavorites.getAll({user_id})
+        if(!favorites) {
+            return null;
+        }
+        return favorites;
     }
 };

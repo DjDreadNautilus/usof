@@ -17,7 +17,10 @@ import { validateStatus } from "../../middleware/posts/validateStatus.js";
 router.get("/", optionalAuth, 
     PostController.getAllFiltered
 );
-
+router.get("/favorites",
+    authenticateAccessToken,
+    PostController.getAllFavorites
+);
 router.get("/:post_id", 
     checkItem(Post, "post_id"),
     PostController.getById
@@ -41,6 +44,12 @@ router.post("/",
     validateContent,
     validateCategories, 
     PostController.createPost
+);
+
+router.post("/:post_id/favorite",
+    authenticateAccessToken,
+    checkItem(Post, "post_id"),
+    PostController.addFavorite
 );
 
 router.post("/:post_id/comments", 

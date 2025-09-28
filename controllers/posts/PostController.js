@@ -77,7 +77,7 @@ class PostController extends Likable {
             const favorite = await postService.addFavorite(post.id, user.user_id);
 
             if(!favorite) {
-                res.status(200).json({message: "Deleted favorite"});
+                return res.status(200).json({message: "Deleted favorite"});
             }
 
             res.status(200).json({favorite, message: "Favorited the post!"})
@@ -140,6 +140,20 @@ class PostController extends Likable {
             });
             res.json(posts);
         } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    }
+
+    getAllFavorites = async (req, res) => {
+        try {
+            const user = req.user;
+
+            const favorites = postService.getAllFavorite(user.user_id);
+            if(!favorites) {
+                return res.status(404).json({error: "No favorites found"});
+            }
+            res.status(200).json({favorites, message: "Got favorites"})
+        } catch(err) {
             res.status(500).json({ error: err.message });
         }
     }

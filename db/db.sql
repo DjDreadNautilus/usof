@@ -2,9 +2,6 @@ DROP DATABASE IF EXISTS usof;
 CREATE DATABASE IF NOT EXISTS usof;
 USE usof;
 
-CREATE USER IF NOT EXISTS 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
-GRANT ALL PRIVILEGES ON usof.* TO 'root'@'localhost';
-
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     login VARCHAR(255) NOT NULL,
