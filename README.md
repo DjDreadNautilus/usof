@@ -56,6 +56,9 @@ This API is the backend foundation for the future USOF web application. It provi
 <li>Go in directory:
   <pre><code>cd kottster</code></pre>
 </li>
+<li>Install dependenies:
+  <pre><code>nmp install</code></pre>
+</li>
 <li>Run admin panel:
   <pre><code>npm run dev</code></pre>
 </li>
