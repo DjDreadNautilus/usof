@@ -25,5 +25,11 @@ export const userService = {
         await user.update(updates);
 
         return user;
+    },
+
+    getUserById: async (user_id) => {
+       const user = await User.find({id: user_id});
+       
+       return user || null;
     }
 }

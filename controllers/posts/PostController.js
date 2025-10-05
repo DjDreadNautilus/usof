@@ -5,6 +5,7 @@ import { postService } from "../../services/postService.js";
 import { commentService } from "../../services/commentService.js";
 import { categoryService } from "../../services/categoryService.js";
 import { subscriptionService } from "../../services/subscriptionService.js";
+import { userService } from "../../services/userService.js";
 
 class PostController extends Likable {
     constructor() {
@@ -120,6 +121,7 @@ class PostController extends Likable {
             if(req.user && req.user.role === "admin") {
                 status = ""
             }
+
             let category_ids = [];
             if (query.category_ids) {
                 category_ids = query.category_ids.split(",").map(id => parseInt(id));
@@ -128,36 +130,65 @@ class PostController extends Likable {
             const limit = query.limit ? parseInt(query.limit) : 5;
             const page = query.page ? parseInt(query.page) : 1;
 
+            const validSortFields = ["created_at", "rating", "title", "updated_at"]; 
+            const sort_by = validSortFields.includes(query.sort_by) ? query.sort_by : "rating";
+            const order = query.order && query.order.toUpperCase() === "ASC" ? "ASC" : "DESC";
+
             const filters = {
                 category_ids,
-                favorites: favorites,
-                status: status,
+                favorites,
+                status,
+                user_id: query.user_id,
                 created_from: query.created_from,
                 created_to: query.created_to,
             };
 
             Object.keys(filters).forEach(key => filters[key] === undefined && delete filters[key]);
-            console.log(filters);
+
+            console.log({ filters, sort_by, order });
 
             const { rows, total } = await postService.getAllFiltered({
                 page,
                 limit,
                 filters,
+                sort_by,
+                order,
             });
 
             const totalPages = Math.ceil(total / limit);
+  
+
+            const posts = await Promise.all(
+                rows.map(async (post) => {
+                    console.log("Fetching categories for post", post.id);
+                    const categories = await categoryService.getCategoriesByPostId(post.id);
+                    console.log("Fetching authors for post", post.id);
+                    const user = await userService.getUserById(post.user_id);
+
+                    const author = {
+                        id: user.id,
+                        login: user.login,
+                        fullname: user.fullname,
+                    };
+
+                    return { ...post, categories, author };
+                })
+            );
+
+            console.log(posts)
 
             res.json({
                 pagination: {
                     totalItems: total,
-                    totalPages: totalPages,
+                    totalPages,
                     currentPage: page,
-                    limit: limit,
+                    limit,
                     hasNextPage: page < totalPages,
                     hasPrevPage: page > 1
                 },
-                data: rows
+                data: posts
             });
+
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
@@ -185,6 +216,17 @@ class PostController extends Likable {
             const subscribe = await postService.subscribeToPost(user.user_id, post.id);
 
             res.status(200).json({subscribe, message: "Subscribed to post"});
+        } catch(err) {
+            res.status(500).json({ error: err.message });
+        }
+    }
+
+    getById = async (req, res) => {
+        try {
+            const post = req.item;
+            const categories = await categoryService.getCategoriesByPostId(post.id);
+
+            res.status(200).json({post, categories, message: "Got the post"});
         } catch(err) {
             res.status(500).json({ error: err.message });
         }

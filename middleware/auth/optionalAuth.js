@@ -2,6 +2,10 @@ import jwt from "jsonwebtoken";
 
 export const optionalAuth = (req, res, next) => {
     const authHeader = req.headers["authorization"];
+    if (!authHeader) {
+        req.user = null;
+        return next();
+    }
     const token = authHeader.split(" ")[1];
     
     if (!token) {

@@ -5,6 +5,7 @@ import Post from "../models/Posts.js";
 import PostCategories from "../models/PostCategories.js";
 import UserFavorites from "../models/UserFavorites.js";
 import UserSubscribes from "../models/UserSubscribes.js";
+import { categoryService } from "./categoryService.js";
 
 export const postService = {
     createPost: async (user_id, title, content, categories, images) => {
@@ -46,6 +47,15 @@ export const postService = {
         return post;
     },
 
+    getPostById: async (post_id) => {
+        const post = await Post.find({id: post_id});
+        const categories = await categoryService.getCategoriesByPostId(post_id);
+
+        post.categories = categories;
+
+        return post;
+    },
+
     getAllFiltered: async ({ page = 1, limit = 5, orderBy = "rating", order = "DESC", filters = {} } = {}) => {
         const offset = (page - 1) * limit;
         const status = filters.status;
@@ -57,7 +67,6 @@ export const postService = {
         const allowedOrder = ["ASC", "DESC"];
         if (!allowedOrder.includes(order.toUpperCase())) order = "DESC";
 
-        // Base FROM + JOIN clause for reusability
         let baseFrom = `
             FROM posts p
             LEFT JOIN likes l ON l.post_id = p.id
@@ -68,7 +77,6 @@ export const postService = {
             baseFrom += ` INNER JOIN user_favorites uf ON uf.post_id = p.id AND uf.user_id = ${filters.favorites}`;
         }
 
-        // WHERE clause
         let whereClause = ` WHERE p.status = ?`;
         if (filters.category_ids?.length > 0) {
             const placeholders = filters.category_ids.map(() => "?").join(",");
@@ -83,8 +91,11 @@ export const postService = {
             whereClause += ` AND p.created_at <= ?`;
             values.push(filters.created_to);
         }
+        if(filters.user_id) {
+            whereClause += ` AND p.user_id = ?`;
+            values.push(filters.user_id);
+        } 
 
-        // 1️⃣ Get total count
         const countSql = `
             SELECT COUNT(DISTINCT p.id) AS total
             ${baseFrom}
@@ -93,7 +104,6 @@ export const postService = {
         const [countResult] = await pool.execute(countSql, values);
         const total = countResult[0].total;
 
-        // 2️⃣ Get paginated posts
         const dataSql = `
             SELECT p.*, 
                 COALESCE(SUM(CASE WHEN l.type='like' THEN 1 
