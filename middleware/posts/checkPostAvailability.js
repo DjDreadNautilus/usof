@@ -3,7 +3,7 @@ export const checkPostAvailability = (req, res, next) => {
         const post = req.item;
         console.log(post);
         if(post.status !== "active") {
-            return res.status(403).json({error: "Post is unavailable"});
+            return res.status(403).json({message: "Post is unavailable"});
         }
 
         next();

@@ -12,12 +12,12 @@ class NotificationController extends BaseController {
             const user = req.user;
             const notifications = await subscriptionService.getNotificationsForUser(user.user_id);
             if(!notifications) {
-                return res.status(404).json({error: "no notifications"});
+                return res.status(404).json({message: "no notifications"});
             }
 
             res.status(200).json({notifications, message: "Got notifications"});
         } catch(err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ message: err.message });
         }
     }
 
@@ -27,12 +27,12 @@ class NotificationController extends BaseController {
             const notifications = await subscriptionService.clearNotificationsForUser(user.user_id);
 
             if(!notifications) {
-                return res.status(404).json({error: "No notifications"})
+                return res.status(404).json({message: "No notifications"})
             }
 
             res.status(200).json({message: "Notifications cleared"});
         } catch(err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ message: err.message });
         }
     }
 }

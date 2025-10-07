@@ -27,6 +27,9 @@ router.post("/email-confirm/:confirm_token", validateEmailConfirm, authControlle
 router.post("/password-reset", resetPasswordController.sendResetMail);
 router.post("/password-reset/:confirm_token", validatePasswordReset, resetPasswordController.resetPassword);
 
+router.post("/refresh", (req, res) => {
+    
+})
 
 
 export default router;

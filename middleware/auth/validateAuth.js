@@ -5,7 +5,7 @@ export async function validateAuth(req, res, next) {
     const { login, password, email } = req.body;
 
     if (!login || !password || !email) {
-        return res.status(400).send({ error: "All fields are required!" });
+        return res.status(400).send({ message: "All fields are required!" });
     }
 
     const existingLogins = await User.getAll({ login });
@@ -22,7 +22,7 @@ export async function validateAuth(req, res, next) {
     const isMatch = await Hash.compareHash(password, user.password);
 
     if (!isMatch) {
-        return res.status(400).send({ error: "Incorrect password!" });
+        return res.status(400).send({ message: "Incorrect password!" });
     }
 
     req.user = user;

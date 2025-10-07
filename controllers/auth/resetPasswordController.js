@@ -10,7 +10,7 @@ class resetPasswordController {
 
             const user = await User.find({ email });
             if (!user) {
-                return res.status(400).json({ error: "User not found" });
+                return res.status(400).json({ message: "User not found" });
             }
 
             const token = await tokenService.createResetToken(email);
@@ -25,7 +25,7 @@ class resetPasswordController {
 
             res.status(200).json({ message: "Reset message sent!" });
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ message: err.message });
         }
     }
 
@@ -40,7 +40,7 @@ class resetPasswordController {
 
             res.status(200).json({ message: "Password reset!" });
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ message: err.message });
         }
     }
 };

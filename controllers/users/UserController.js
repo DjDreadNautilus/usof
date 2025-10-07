@@ -16,7 +16,7 @@ class UserController extends BaseController {
 
             res.status(201).json({ user, message: "User created!"});
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ message: err.message });
         }
     }
 
@@ -25,7 +25,7 @@ class UserController extends BaseController {
             const user = req.item;
             console.log(user);
             if (!user) {
-                return res.status(404).json({ error: "User not found" });
+                return res.status(404).json({ message: "User not found" });
             }
 
             const updates = req.updates;
@@ -34,19 +34,19 @@ class UserController extends BaseController {
 
             res.status(200).json({updatedUser, message: "User updated!" });
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ message: err.message });
         }
     }
 
     async updateAvatar(req, res) {
         try {
             if (!req.file) {
-                return res.status(400).json({ error: "Avatar file is required" });
+                return res.status(400).json({ message: "Avatar file is required" });
             }
             
             const user = await User.find({ id: req.user.user_id });
             if (!user) {
-                return res.status(404).json({ error: "User not found" });
+                return res.status(404).json({ message: "User not found" });
             }
 
             const relativePath = `/uploads/avatars/${req.file.filename}`;
@@ -58,7 +58,7 @@ class UserController extends BaseController {
                 avatar: relativePath
             });
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ message: err.message });
         }
     }
 }

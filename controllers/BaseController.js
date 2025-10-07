@@ -13,7 +13,7 @@ class BaseController {
             const items = await this.model.getAll({});
             res.json(items);
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ message: err.message });
         }
     };
 
@@ -23,12 +23,12 @@ class BaseController {
             const item = await this.model.find({ id });
 
             if (!item) {
-                return res.status(404).json({ error: "Not found" });
+                return res.status(404).json({ message: "Not found" });
             }
 
             res.json(item);
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ message: err.message });
         }
     };
 
@@ -38,14 +38,14 @@ class BaseController {
             const item = await this.model.find({ id });
 
             if (!item) {
-                return res.status(404).json({ error: "Not found" });
+                return res.status(404).json({ message: "Not found" });
             }
             await item.delete();
             console.log(item);
             await recalculateUserRating(item.user_id);
             res.json({ status: "Success", message: "Deleted" });
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ message: err.message });
         }
     };
 }

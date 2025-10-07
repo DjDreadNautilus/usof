@@ -20,7 +20,7 @@ class CategoryController extends BaseController {
 
             res.status(200).json({ category, message: "Successfully created a category!" });
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ message: err.message });
         }
     }
 
@@ -36,7 +36,7 @@ class CategoryController extends BaseController {
 
             res.json({updatedCatergory, message: "Category updated!" });
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ message: err.message });
         }
     }
 
@@ -52,7 +52,7 @@ class CategoryController extends BaseController {
 
             res.status(200).json({posts, message: "Got posts from category!"});
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ message: err.message });
         }
     }
 }

@@ -43,5 +43,11 @@ export const categoryService = {
 
         const posts = await Post.getAll({ id: ids });
         return posts;
+    },
+
+    getCategoryByTitle: async (categoryTitle) => {
+        const category = await Category.find({title: categoryTitle});
+        
+        return category || null;
     }
 }

@@ -58,8 +58,7 @@ export const postService = {
 
     getAllFiltered: async ({ page = 1, limit = 5, orderBy = "rating", order = "DESC", filters = {} } = {}) => {
         const offset = (page - 1) * limit;
-        const status = filters.status;
-        const values = [status];
+        const values = [];
 
         const allowedOrderBy = ["rating", "created_at"];
         if (!allowedOrderBy.includes(orderBy)) orderBy = "rating";
@@ -77,7 +76,14 @@ export const postService = {
             baseFrom += ` INNER JOIN user_favorites uf ON uf.post_id = p.id AND uf.user_id = ${filters.favorites}`;
         }
 
-        let whereClause = ` WHERE p.status = ?`;
+        let whereClause = "";
+
+        if (filters.status !== undefined && filters.status !== null) {
+            whereClause = ` WHERE p.status = ?`;
+            values.push(filters.status);
+        } else {
+            whereClause = ` WHERE 1=1`;
+        }
         if (filters.category_ids?.length > 0) {
             const placeholders = filters.category_ids.map(() => "?").join(",");
             whereClause += ` AND pc.category_id IN (${placeholders})`;

@@ -24,7 +24,7 @@ class AuthController {
 
             res.status(200).json({ message: "Logged in!", accessToken });
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ message: err.message });
         }
     }
 
@@ -50,14 +50,14 @@ class AuthController {
 
             res.status(200).json({user, message: "Registered! Check your mailbox to confirm email!" });
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ message: err.message });
         }
     }
 
     logout = async (req, res) => {
         try {
             const refreshToken = req.cookies.refreshToken;
-            if (!refreshToken) return res.status(400).json({ error: "No refresh token provided" });
+            if (!refreshToken) return res.status(400).json({ message: "No refresh token provided" });
 
             const user = await tokenService.verifyToken(refreshToken);
 
@@ -84,7 +84,7 @@ class AuthController {
 
             res.status(200).json({ message: "You were logged out" });
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ message: err.message });
         }
     }
 
@@ -96,7 +96,7 @@ class AuthController {
 
             res.status(200).json({ message: "User verified!" });
         } catch(err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ message: err.message });
         }
     }
 }

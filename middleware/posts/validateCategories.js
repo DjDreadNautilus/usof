@@ -5,6 +5,10 @@ export async function validateCategories(req, res, next) {
         const { categories } = req.body;
         if (categories === undefined) return next();
 
+        if(categories.length === 0) {
+            return res.status(400).json({message: "Add at least 1 category"});
+        }
+        
         if (!Array.isArray(categories)) {
             return res.status(400).json({ message: "Categories must be an array." });
         }

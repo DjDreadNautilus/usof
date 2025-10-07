@@ -33,7 +33,7 @@ class Likable extends BaseController {
             const id = req.params[this.target];
             const likes = await likeService.getLikesByTargetId(this.target, id);
             if(!likes) {
-                return res.status(404).json({erorr: "No likes"});
+                return res.status(404).json({message: "No likes"});
             }
             res.status(200).json({ likes, message: "Likes retrieved successfully" });
         } catch (err) {
